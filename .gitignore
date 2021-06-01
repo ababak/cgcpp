@@ -1,0 +1,65 @@
+# General
+*.py[cod]
+
+# Packages
+*.egg
+*.egg-info
+*.eggs/*
+dist
+build
+.eggs
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Virtual environments
+venv
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+# Build files
+/resource/*.css
+
+# Caches
+.sass-cache/
+Thumbs.db
+
+# Development
+.project
+.pydevproject
+.settings
+.idea/
+.vscode
+
+# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Built libraries
+*.dll
+*.pyd
+*.so
+
+# Out
+out

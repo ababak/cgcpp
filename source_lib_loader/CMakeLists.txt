@@ -1,0 +1,13 @@
+# docker run --rm -it -v "$(pwd -W):c:/source" -v "$(pwd -W)/../out:c:/out" cgcpp
+
+cmake_minimum_required (VERSION 3.16)
+find_package (init)
+
+project (lib_loader)
+set (SRC "lib_loader.cpp")
+if (WIN32)
+    set (CMAKE_SHARED_LIBRARY_SUFFIX_CXX ".pyd")
+endif (WIN32)
+build_python_module ("Release")
+
+message (STATUS "CMAKE_INSTALL_PREFIX is ${CMAKE_INSTALL_PREFIX}")

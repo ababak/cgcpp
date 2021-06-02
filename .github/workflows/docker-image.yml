@@ -24,8 +24,5 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@master
         with:
-          context: .
-          file: ./Dockerfile
-          target: prod
           push: ${{ github.event_name != 'pull_request' }}
-          tags: latest
+          tags: ababak/cgcpp:latest

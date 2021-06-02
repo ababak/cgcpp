@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 01/06/2021 14:45:50
+modified: 02/06/2021 17:10:35
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -20,8 +20,8 @@ import platform
 import subprocess
 
 from distutils.version import LooseVersion
-from setuptools.command.test import test as TestCommand
 from setuptools.command.build_ext import build_ext
+from setuptools.command.bdist_egg import bdist_egg as BuildEggCommand
 import setuptools
 import pkg_resources
 
@@ -85,7 +85,6 @@ class CMakeBuild(build_ext):
             self.build_extension(ext)
 
     def build_extension(self, ext):
-        return
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         if not os.path.exists(extdir):
             os.makedirs(extdir)
@@ -130,6 +129,22 @@ class BuildPlugin(setuptools.Command):
         )
 
 
+class BuildEgg(BuildEggCommand):
+    '''Custom egg build to ensure resources built.
+
+    .. note::
+
+        Required because when this project is a dependency for another project,
+        only bdist_egg will be called and *not* build.
+
+    '''
+
+    def run(self):
+        '''Run egg build ensuring build_resources called first.'''
+        self.run_command('build_ext')
+        BuildEggCommand.run(self)
+
+
 # Configuration.
 setuptools.setup(
     name="cgcpp",
@@ -144,6 +159,10 @@ setuptools.setup(
     packages=setuptools.find_packages(SOURCE_PATH),
     package_dir={"": "source"},
     ext_modules=[CMakeExtension("cgcpp/lib_loader", "source_lib_loader")],
-    cmdclass={"build_plugin": BuildPlugin, "build_ext": CMakeBuild},
+    cmdclass={
+        "build_ext": CMakeBuild,
+        "bdist_egg": BuildEgg,
+        "build_plugin": BuildPlugin,
+    },
     zip_safe=False,
 )

@@ -15,7 +15,7 @@ Support for Python 3, other platforms and other CG applications will come later.
 
 ## Installation
 
-    python -m pip install cgcpp
+    python -m pip install git+https://github.com/ababak/cgcpp.git
 
 ## Build the examples
 

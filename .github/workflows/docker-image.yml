@@ -20,9 +20,8 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@master
-        with:
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ababak/cgcpp:latest
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag ababak/cgcpp:latest
+
+      - name: Push
+        run: docker push ababak/cgcpp:latest

@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 03/06/2021
-modified: 03/06/2021 17:11:22
+modified: 03/06/2021 17:15:57
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -33,7 +33,7 @@ def build(source_dir, destination_dir=None, maya_dir=None):
         print("Please reinstall cgcpp to rebuild it")
         return 3
     print('Building: "{}"'.format(source_dir))
-    print('Output: "{}"'.format(out_dir))
+    print('Output: "{}"'.format(destination_dir))
     docker_args = [
         DOCKER_APP,
         "run",
@@ -41,7 +41,7 @@ def build(source_dir, destination_dir=None, maya_dir=None):
         "-v",
         "{}:c:/source:ro".format(os.path.abspath(source_dir)),
         "-v",
-        "{}:c:/out".format(os.path.abspath(out_dir)),
+        "{}:c:/out".format(os.path.abspath(destination_dir)),
     ]
     if maya_dir:
         maya_dir = os.path.abspath(maya_dir).replace("\\", "/")

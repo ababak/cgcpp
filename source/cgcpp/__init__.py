@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 31/05/2021
-modified: 01/06/2021 12:14:32
+modified: 03/06/2021 16:37:24
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -15,6 +15,7 @@ Containerized builds and runtime loading
 import os
 import inspect
 import platform
+from . import build
 from ._version import __version__
 
 __copyright__ = "(c) Andriy Babak 2021"

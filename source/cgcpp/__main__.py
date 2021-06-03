@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 01/06/2021
-modified: 01/06/2021 14:35:04
+modified: 03/06/2021 16:48:44
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -18,34 +18,7 @@ import argparse
 import subprocess
 
 from . import __version__, __copyright__
-
-DOCKER_APP = "docker"
-DOCKER_IMAGE = "cgcpp"
-
-
-def execute_task(command, shell=False, prefix="", env=None):
-    """
-    Execute task and print out the output
-    """
-    try:
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, shell=shell, env=env)
-    except OSError:
-        out_text = 'Command not found: "{}"'.format(command)
-        if prefix:
-            out_text = "[" + prefix + "] " + out_text
-        print(out_text)
-        raise
-    except Exception as e:
-        print('Error executing the command "%s": %r', command, e)
-        raise
-    for stdout_line in iter(proc.stdout.readline, b""):
-        out_text = stdout_line.strip()
-        if prefix:
-            out_text = "[" + prefix + "] " + out_text
-        print(out_text)
-    proc.stdout.close()
-    return_code = proc.wait()
-    return return_code
+from . import build
 
 
 def main():
@@ -74,38 +47,11 @@ def main():
     if not os.path.isdir(args.source):
         print('[ERROR] Directory does not exist: "{}"'.format(source_dir))
         sys.exit(1)
-    try:
-        out = subprocess.check_output([DOCKER_APP, "--version"])
-    except OSError:
-        print("[ERROR] Docker not installed")
-        sys.exit(2)
-    out = subprocess.check_output([DOCKER_APP, "images", "-q", DOCKER_IMAGE])
-    if not out:
-        print("[ERROR] Docker image is missing: {}".format(DOCKER_IMAGE))
-        print("Please reinstall cgcpp to rebuild it")
-        sys.exit(3)
-    print('Building: "{}"'.format(source_dir))
-    print('Output: "{}"'.format(out_dir))
-    docker_args = [
-        DOCKER_APP,
-        "run",
-        "--rm",
-        # "-it",
-        "-v",
-        "{}:c:/source:ro".format(os.path.abspath(source_dir)),
-        "-v",
-        "{}:c:/out".format(os.path.abspath(out_dir)),
-    ]
-    if args.maya:
-        if not os.path.isdir(args.maya):
-            print(
-                '[ERROR] Autodesk Maya directory does not exist: "{}"'.format(args.maya)
-            )
-            sys.exit(1)
-        docker_args += ["-v", args.maya + ":c:/autodesk:ro"]
-        print('Autodesk Maya search directory: "{}"'.format(args.maya))
-    docker_args += [DOCKER_IMAGE]
-    subprocess.check_call(docker_args)
+    result = build.build(
+        source_dir=source_dir, destionation_dir=out_dir, maya_dir=args.maya
+    )
+    if not result:
+        sys.exit(result)
 
 
 if __name__ == "__main__":

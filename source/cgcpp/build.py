@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 03/06/2021
-modified: 03/06/2021 16:46:06
+modified: 03/06/2021 17:11:22
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -19,12 +19,10 @@ DOCKER_APP = "docker"
 DOCKER_IMAGE = "cgcpp"
 
 
-def build(source_dir, destionation_dir=None, maya_dir=None):
+def build(source_dir, destination_dir=None, maya_dir=None):
     """Run docker image to build source directory."""
     source_dir = os.path.abspath(source_dir).replace("\\", "/")
-    destionation_dir = os.path.abspath(destionation_dir or source_dir).replace(
-        "\\", "/"
-    )
+    destination_dir = os.path.abspath(destination_dir or source_dir).replace("\\", "/")
     try:
         out = subprocess.check_output([DOCKER_APP, "images", "-q", DOCKER_IMAGE])
     except OSError:

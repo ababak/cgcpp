@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 31/05/2021
-modified: 03/06/2021 16:37:24
+modified: 04/06/2021 17:38:46
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -21,7 +21,7 @@ from ._version import __version__
 __copyright__ = "(c) Andriy Babak 2021"
 
 
-def _get_library_path(lib_path):
+def get_library_path(lib_path, extra_frames=0):
     """
     Try to guess a full library path
     """
@@ -38,12 +38,13 @@ def _get_library_path(lib_path):
     if not lib_dir:
         # get call stack frames
         frames = inspect.stack(0)
+        frame = 1 + extra_frames
         # should be the third frame
         # 0: this function
         # 1: this module"s "call" function
         # 2: the caller
-        if len(frames) > 2:
-            path = frames[2][1]
+        if len(frames) > frame:
+            path = frames[frame][1]
             if path:
                 lib_dir = os.path.dirname(path)
     full_lib_path = os.path.join(os.path.abspath(lib_dir), lib_name + lib_ext)
@@ -80,5 +81,5 @@ def call(*args, **kwargs):
     if not lib_path or not func_name:
         raise AttributeError('Invalid usage. Expected arguments: "lib", "func"')
     modified_kwargs = dict(kwargs)
-    modified_kwargs["lib"] = _get_library_path(lib_path)
+    modified_kwargs["lib"] = get_library_path(lib_path, extra_frames=1)
     return lib_loader.call(*args, **modified_kwargs)

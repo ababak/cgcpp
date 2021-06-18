@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 03/06/2021
-modified: 03/06/2021 17:15:57
+modified: 18/06/2021 13:00:23
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -19,7 +19,7 @@ DOCKER_APP = "docker"
 DOCKER_IMAGE = "cgcpp"
 
 
-def build(source_dir, destination_dir=None, maya_dir=None):
+def build(source_dir, destination_dir=None, maya_dir=None, sidefx_dir=None):
     """Run docker image to build source directory."""
     source_dir = os.path.abspath(source_dir).replace("\\", "/")
     destination_dir = os.path.abspath(destination_dir or source_dir).replace("\\", "/")
@@ -52,6 +52,13 @@ def build(source_dir, destination_dir=None, maya_dir=None):
             return 1
         docker_args += ["-v", maya_dir + ":c:/autodesk:ro"]
         print('Autodesk Maya search directory: "{}"'.format(maya_dir))
+    if sidefx_dir:
+        sidefx_dir = os.path.abspath(sidefx_dir).replace("\\", "/")
+        if not os.path.isdir(sidefx_dir):
+            print('[ERROR] SideFX directory does not exist: "{}"'.format(sidefx_dir))
+            return 1
+        docker_args += ["-v", sidefx_dir + ":c:/sidefx:ro"]
+        print('SideFX search directory: "{}"'.format(sidefx_dir))
     docker_args += [DOCKER_IMAGE]
     subprocess.check_call(docker_args)
     return 0

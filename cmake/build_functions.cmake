@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2021
 # 
 # date: 08/09/2020
-# modified: 18/06/2021 15:53:21
+# modified: 18/06/2021 16:47:45
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -69,19 +69,19 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
     if (_houdini_platform_linux)
         # Link against Houdini libraries (including USD)
         if (DEFINED ENV{HOUDINI_HDK_LINK_GUSD})
-        target_link_libraries(${PLUGIN_NAME}
+        target_link_libraries(${PROJECT_NAME}
             Houdini
             ${_houdini_hfs_root}/dsolib/libgusd.so
         )
         else ()
-        target_link_libraries(${PLUGIN_NAME}
+        target_link_libraries(${PROJECT_NAME}
             Houdini			# Standard Houdini librarys
         )
         endif ()
     elseif (_houdini_platform_osx)
         # Link against Houdini libraries (including USD)
         set(_lib_dir "${_houdini_hfs_root}/Frameworks/Houdini.framework/Versions/Current/Libraries")
-        target_link_libraries(${PLUGIN_NAME}
+        target_link_libraries(${PROJECT_NAME}
             Houdini
             ${_lib_dir}/libpxr_ar.dylib
             ${_lib_dir}/libpxr_arch.dylib
@@ -105,7 +105,7 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
         )
     elseif(_houdini_platform_win)
         # Link against Houdini libraries (including USD)
-        target_link_libraries(${PLUGIN_NAME}
+        target_link_libraries(${PROJECT_NAME}
             Houdini
             ${_houdini_hfs_root}/custom/houdini/dsolib/libgusd.lib
             ${_houdini_hfs_root}/custom/houdini/dsolib/libpxr_ar.lib

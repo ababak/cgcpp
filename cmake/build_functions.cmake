@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2021
 # 
 # date: 08/09/2020
-# modified: 18/06/2021 13:02:37
+# modified: 18/06/2021 15:03:35
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -127,7 +127,7 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
         TARGETS ${TARGET_NAME} RUNTIME
         DESTINATION ${CMAKE_INSTALL_PREFIX}
     )
-)endfunction()
+endfunction()
 
 
 

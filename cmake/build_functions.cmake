@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2021
 # 
 # date: 08/09/2020
-# modified: 18/06/2021 15:03:35
+# modified: 18/06/2021 15:53:21
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -50,6 +50,11 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
     set (CMAKE_BUILD_TYPE "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
     set (TARGET_NAME "${PROJECT_NAME}")
     set (HFS "C:/sidefx/Houdini ${HOUDINI_VERSION}")
+    # CMAKE_PREFIX_PATH must contain the path to the toolkit/cmake subdirectory of
+    # the Houdini installation. See the "Compiling with CMake" section of the HDK
+    # documentation for more details, which describes several options for
+    # specifying this path.
+    list(APPEND CMAKE_PREFIX_PATH "${HFS}/toolkit/cmake")
     find_package (Houdini REQUIRED)
     add_library (${TARGET_NAME} SHARED ${SRC})
     set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "")

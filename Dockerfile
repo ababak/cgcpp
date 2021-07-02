@@ -66,7 +66,7 @@ RUN mklink %BOOST_ROOT%\lib64-msvc-14.1\boost_pythonPY_MAJOR_VERSIONPY_MINOR_VER
 
 #######################################################
 
-COPY build.bat C:\build\build.bat
+COPY build.bat C:\build.bat
 COPY cmake C:\cmake
 RUN setx PATH "c:/cmake;%PATH%"
 ENV CMAKE_GENERATOR "NMake Makefiles"
@@ -77,4 +77,4 @@ FROM base as prebuild
 WORKDIR /build
 
 ENTRYPOINT [ "C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "-arch=amd64", "&&" ]
-CMD [ "build.bat" ]
+CMD [ "c:\\build.bat" ]

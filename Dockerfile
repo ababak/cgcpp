@@ -15,9 +15,8 @@ LABEL maintainer="ababak@gmail.com"
 # Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
 
-ADD https://aka.ms/vscollect.exe C:\TEMP\collect.exe
-ADD https://aka.ms/vs/16/release/channel C:\TEMP\VisualStudio.chman
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:\TEMP\vs_buildtools.exe
+ADD https://aka.ms/vs/16/release/channel C:\TEMP\VisualStudio.chman
 
 # Install MSVC C++ compiler, CMake, and MSBuild.
 RUN C:\TEMP\vs_buildtools.exe `

@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 03/06/2021
-modified: 18/06/2021 13:00:23
+modified: 02/07/2021 10:48:39
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -19,7 +19,7 @@ DOCKER_APP = "docker"
 DOCKER_IMAGE = "cgcpp"
 
 
-def build(source_dir, destination_dir=None, maya_dir=None, sidefx_dir=None):
+def build(source_dir, destination_dir=None, build_dir=None, maya_dir=None, sidefx_dir=None):
     """Run docker image to build source directory."""
     source_dir = os.path.abspath(source_dir).replace("\\", "/")
     destination_dir = os.path.abspath(destination_dir or source_dir).replace("\\", "/")
@@ -32,7 +32,8 @@ def build(source_dir, destination_dir=None, maya_dir=None, sidefx_dir=None):
         print("[ERROR] Docker image is not available: {}".format(DOCKER_IMAGE))
         print("Please reinstall cgcpp to rebuild it")
         return 3
-    print('Building: "{}"'.format(source_dir))
+    print('Source: "{}"'.format(source_dir))
+    print('Build: "{}"'.format(build_dir))
     print('Output: "{}"'.format(destination_dir))
     docker_args = [
         DOCKER_APP,
@@ -42,6 +43,11 @@ def build(source_dir, destination_dir=None, maya_dir=None, sidefx_dir=None):
         "{}:c:/source:ro".format(os.path.abspath(source_dir)),
         "-v",
         "{}:c:/out".format(os.path.abspath(destination_dir)),
+    ]
+    if build_dir:
+        docker_args+= [
+        "-v",
+        "{}:c:/build".format(os.path.abspath(build_dir))
     ]
     if maya_dir:
         maya_dir = os.path.abspath(maya_dir).replace("\\", "/")

@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 01/06/2021
-modified: 03/06/2021 16:48:44
+modified: 17/03/2022 17:10:03
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -41,6 +41,15 @@ def main():
         nargs="?",
         const=maya_default_directory,
     )
+    sidefx_default_directory = "C:/Program Files/Side Effects Software"
+    parser.add_argument(
+        "--sidefx",
+        help='SideFX directory with Houdini installations. Default: "{}".'.format(
+            sidefx_default_directory
+        ),
+        nargs="?",
+        const=sidefx_default_directory,
+    )
     args, unknownargs = parser.parse_known_args()
     source_dir = os.path.abspath(args.source).replace("\\", "/")
     out_dir = os.path.abspath(args.out or source_dir).replace("\\", "/")
@@ -48,7 +57,10 @@ def main():
         print('[ERROR] Directory does not exist: "{}"'.format(source_dir))
         sys.exit(1)
     result = build.build(
-        source_dir=source_dir, destionation_dir=out_dir, maya_dir=args.maya
+        source_dir=source_dir,
+        destination_dir=out_dir,
+        maya_dir=args.maya,
+        sidefx_dir=args.sidefx,
     )
     if not result:
         sys.exit(result)

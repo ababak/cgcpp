@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2021
 # 
 # date: 08/09/2020
-# modified: 18/06/2021 16:47:45
+# modified: 16/08/2021 14:52:21
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -55,6 +55,7 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
     # documentation for more details, which describes several options for
     # specifying this path.
     list(APPEND CMAKE_PREFIX_PATH "${HFS}/toolkit/cmake")
+    find_package (Boost REQUIRED COMPONENTS python27 system filesystem)
     find_package (Houdini REQUIRED)
     add_library (${TARGET_NAME} SHARED ${SRC})
     set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "")
@@ -66,17 +67,21 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
     )
     set(_houdini_python_version 2.7)
     set(_houdini_python_dotless_version 27)
+    target_include_directories (
+        ${TARGET_NAME}
+        PRIVATE ${Boost_INCLUDE_DIRS}
+    )
     if (_houdini_platform_linux)
         # Link against Houdini libraries (including USD)
         if (DEFINED ENV{HOUDINI_HDK_LINK_GUSD})
-        target_link_libraries(${PROJECT_NAME}
-            Houdini
-            ${_houdini_hfs_root}/dsolib/libgusd.so
-        )
+            target_link_libraries(${PROJECT_NAME}
+                Houdini
+                ${_houdini_hfs_root}/dsolib/libgusd.so
+            )
         else ()
-        target_link_libraries(${PROJECT_NAME}
-            Houdini			# Standard Houdini librarys
-        )
+            target_link_libraries(${PROJECT_NAME}
+                Houdini			# Standard Houdini librarys
+            )
         endif ()
     elseif (_houdini_platform_osx)
         # Link against Houdini libraries (including USD)
@@ -126,7 +131,8 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
             ${_houdini_hfs_root}/custom/houdini/dsolib/libpxr_work.lib
             ${_houdini_hfs_root}/custom/houdini/dsolib/hboost_python${_houdini_python_dotless_version}-mt-x64.lib
             ${_houdini_hfs_root}/python${_houdini_python_dotless_version}/libs/python${_houdini_python_dotless_version}.lib
-        )
+            ${Boost_LIBRARIES}
+            )
     endif()
     install (
         TARGETS ${TARGET_NAME} RUNTIME

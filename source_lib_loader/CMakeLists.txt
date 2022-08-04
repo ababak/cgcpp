@@ -8,6 +8,7 @@ set (SRC "lib_loader.cpp")
 if (WIN32)
     set (CMAKE_SHARED_LIBRARY_SUFFIX_CXX ".pyd")
 endif (WIN32)
-build_python_module ("Release")
+build_python_module (2.7 "Release")
+build_python_module (3.9 "Release")
 
 message (STATUS "CMAKE_INSTALL_PREFIX is ${CMAKE_INSTALL_PREFIX}")

@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 03/06/2021 16:38:19
+modified: 04/08/2022 17:50:02
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -16,18 +16,15 @@ import os
 import re
 import sys
 import shutil
-import platform
 import subprocess
 
-from distutils.version import LooseVersion
 from setuptools.command.build_ext import build_ext
 from setuptools.command.bdist_egg import bdist_egg as BuildEggCommand
 import setuptools
-import pkg_resources
 
 # Define paths
 
-PLUGIN_NAME = "cpp-{0}"
+PLUGIN_NAME = "cgcpp-{0}"
 
 ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 SOURCE_PATH = os.path.join(ROOT_PATH, "source")
@@ -56,7 +53,7 @@ class CMakeBuild(build_ext):
     """
 
     DOCKER_APP = "docker"
-    DOCKER_IMAGE = "cgcpp"
+    DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(VERSION.split(".")[:2])
 
     def run(self):
         try:
@@ -71,7 +68,7 @@ class CMakeBuild(build_ext):
             [self.DOCKER_APP, "images", "-q", self.DOCKER_IMAGE]
         )
         if not out:
-            print("Building docker image...")
+            print('Building docker image "{}"...'.format(self.DOCKER_IMAGE))
             docker_args = [
                 self.DOCKER_APP,
                 "build",
@@ -89,11 +86,13 @@ class CMakeBuild(build_ext):
         if not os.path.exists(extdir):
             os.makedirs(extdir)
         sourcedir = ext.sourcedir
+        print(
+            'Building extension "{}" using "{}"...'.format(ext.name, self.DOCKER_IMAGE)
+        )
         docker_args = [
             self.DOCKER_APP,
             "run",
             "--rm",
-            # "-it",
             "-v",
             "{}:c:/source:ro".format(sourcedir),
             "-v",

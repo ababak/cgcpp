@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 03/06/2021
-modified: 02/07/2021 10:48:39
+modified: 04/08/2022 16:58:02
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -15,11 +15,15 @@ from __future__ import print_function
 import os
 import subprocess
 
+from . import __version__
+
 DOCKER_APP = "docker"
-DOCKER_IMAGE = "cgcpp"
+DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(__version__.split(".")[:2])
 
 
-def build(source_dir, destination_dir=None, build_dir=None, maya_dir=None, sidefx_dir=None):
+def build(
+    source_dir, destination_dir=None, build_dir=None, maya_dir=None, sidefx_dir=None,
+):
     """Run docker image to build source directory."""
     source_dir = os.path.abspath(source_dir).replace("\\", "/")
     destination_dir = os.path.abspath(destination_dir or source_dir).replace("\\", "/")
@@ -45,10 +49,7 @@ def build(source_dir, destination_dir=None, build_dir=None, maya_dir=None, sidef
         "{}:c:/out".format(os.path.abspath(destination_dir)),
     ]
     if build_dir:
-        docker_args+= [
-        "-v",
-        "{}:c:/build".format(os.path.abspath(build_dir))
-    ]
+        docker_args += ["-v", "{}:c:/build".format(os.path.abspath(build_dir))]
     if maya_dir:
         maya_dir = os.path.abspath(maya_dir).replace("\\", "/")
         if not os.path.isdir(maya_dir):
@@ -65,6 +66,6 @@ def build(source_dir, destination_dir=None, build_dir=None, maya_dir=None, sidef
             return 1
         docker_args += ["-v", sidefx_dir + ":c:/sidefx:ro"]
         print('SideFX search directory: "{}"'.format(sidefx_dir))
-    docker_args += [DOCKER_IMAGE]
+    docker_args.append(DOCKER_IMAGE)
     subprocess.check_call(docker_args)
     return 0

@@ -1,8 +1,8 @@
 """
-(c) Andriy Babak 2021
+(c) Andriy Babak 2021-2022
 
 date: 01/06/2021
-modified: 17/03/2022 17:10:03
+modified: 04/08/2022 17:02:38
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -15,7 +15,6 @@ from __future__ import print_function, absolute_import
 import os
 import sys
 import argparse
-import subprocess
 
 from . import __version__, __copyright__
 from . import build
@@ -23,8 +22,7 @@ from . import build
 
 def main():
     parser = argparse.ArgumentParser(
-        description="C++ module builder",
-        version=__version__,
+        description="C++ module builder v{}".format(__version__),
         epilog=__copyright__,
         prog="python -m cgcpp",
     )

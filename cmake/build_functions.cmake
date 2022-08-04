@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2021
 # 
 # date: 08/09/2020
-# modified: 16/08/2021 14:52:21
+# modified: 04/08/2022 18:05:28
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -11,14 +11,25 @@
 
 
 function(build_maya_module MAYA_VERSION PROJECT_BUILD_TYPE)
+    find_package (Maya REQUIRED)
     set (CMAKE_BUILD_TYPE "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
-    find_package (Python 2.7 REQUIRED COMPONENTS Interpreter Development)
-    find_package (Boost REQUIRED COMPONENTS python27 system filesystem)
+    if (MAYA_VERSION VERSION_LESS 2023)
+        set(PYTHON_REQUESTED_VERSION 2.7)
+        set(BOOST_REQUESTED_VERSION 1.67.0)
+        set(BOOST_ROOT "C:/local/boost_1_67_0")
+    else ()
+        set(PYTHON_REQUESTED_VERSION 3.9)
+        set(BOOST_REQUESTED_VERSION 1.76.0)
+        set(BOOST_ROOT "C:/local/boost_1_76_0")
+    endif ()
+    message (STATUS "Python version: ${PYTHON_REQUESTED_VERSION}")
+    string (REPLACE "." "" PYTHON_DOTLESS_VERSION "${PYTHON_REQUESTED_VERSION}")
+    find_package (Python ${PYTHON_REQUESTED_VERSION} REQUIRED COMPONENTS Interpreter Development)
+    find_package (Boost ${BOOST_REQUESTED_VERSION} EXACT REQUIRED COMPONENTS python${PYTHON_DOTLESS_VERSION} system filesystem)
     # message (STATUS "Python_LIBRARIES = ${Python_LIBRARIES}")
     # message (STATUS "Boost_LIBRARIES = ${Boost_LIBRARIES}")
     # message (STATUS "Maya_LIBRARIES = ${Maya_LIBRARIES}")
-    find_package (Maya REQUIRED)
-    set (TARGET_NAME "${PROJECT_NAME}_maya${MAYA_VERSION}")
+    set (TARGET_NAME "${PROJECT_NAME}_python${PYTHON_DOTLESS_VERSION}_maya${MAYA_VERSION}")
     add_library (${TARGET_NAME} SHARED ${SRC})
     set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "")
     target_include_directories (
@@ -47,16 +58,27 @@ endfunction()
 
 
 function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
+    find_package (Houdini REQUIRED)
+    if (Houdini_VERSION VERSION_LESS 19.5)
+        set(PYTHON_REQUESTED_VERSION 2.7)
+        set(BOOST_REQUESTED_VERSION 1.67.0)
+        set(BOOST_ROOT "C:/local/boost_1_67_0")
+    else ()
+        set(PYTHON_REQUESTED_VERSION 3.9)
+        set(BOOST_REQUESTED_VERSION 1.76.0)
+        set(BOOST_ROOT "C:/local/boost_1_76_0")
+    endif ()
+    message (STATUS "Python version: ${PYTHON_REQUESTED_VERSION}")
+    string (REPLACE "." "" PYTHON_DOTLESS_VERSION "${PYTHON_REQUESTED_VERSION}")
     set (CMAKE_BUILD_TYPE "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
-    set (TARGET_NAME "${PROJECT_NAME}")
+    set (TARGET_NAME "${PROJECT_NAME}_python${PYTHON_DOTLESS_VERSION}")
     set (HFS "C:/sidefx/Houdini ${HOUDINI_VERSION}")
     # CMAKE_PREFIX_PATH must contain the path to the toolkit/cmake subdirectory of
     # the Houdini installation. See the "Compiling with CMake" section of the HDK
     # documentation for more details, which describes several options for
     # specifying this path.
     list(APPEND CMAKE_PREFIX_PATH "${HFS}/toolkit/cmake")
-    find_package (Boost REQUIRED COMPONENTS python27 system filesystem)
-    find_package (Houdini REQUIRED)
+    find_package (Boost ${BOOST_REQUESTED_VERSION} EXACT REQUIRED COMPONENTS python${PYTHON_DOTLESS_VERSION} system filesystem)
     add_library (${TARGET_NAME} SHARED ${SRC})
     set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "")
     target_compile_features(${TARGET_NAME} PUBLIC
@@ -65,8 +87,6 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
         cxx_nullptr
         cxx_range_for
     )
-    set(_houdini_python_version 2.7)
-    set(_houdini_python_dotless_version 27)
     target_include_directories (
         ${TARGET_NAME}
         PRIVATE ${Boost_INCLUDE_DIRS}
@@ -104,9 +124,9 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
             ${_lib_dir}/libpxr_usdUtils.dylib
             ${_lib_dir}/libpxr_vt.dylib
             ${_lib_dir}/libpxr_work.dylib
-            ${_lib_dir}/libhboost_python${_houdini_python_dotless_version}.dylib
+            ${_lib_dir}/libhboost_python${PYTHON_DOTLESS_VERSION}.dylib
             ${_lib_dir}/libtbb.dylib
-            ${_houdini_hfs_root}/Frameworks/Python.framework/Versions/Current/lib/libpython${_houdini_python_version}.dylib
+            ${_houdini_hfs_root}/Frameworks/Python.framework/Versions/Current/lib/libpython${PYTHON_REQUESTED_VERSION}.dylib
         )
     elseif(_houdini_platform_win)
         # Link against Houdini libraries (including USD)
@@ -129,8 +149,8 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
             ${_houdini_hfs_root}/custom/houdini/dsolib/libpxr_usdUtils.lib
             ${_houdini_hfs_root}/custom/houdini/dsolib/libpxr_vt.lib
             ${_houdini_hfs_root}/custom/houdini/dsolib/libpxr_work.lib
-            ${_houdini_hfs_root}/custom/houdini/dsolib/hboost_python${_houdini_python_dotless_version}-mt-x64.lib
-            ${_houdini_hfs_root}/python${_houdini_python_dotless_version}/libs/python${_houdini_python_dotless_version}.lib
+            ${_houdini_hfs_root}/custom/houdini/dsolib/hboost_python${PYTHON_DOTLESS_VERSION}-mt-x64.lib
+            ${_houdini_hfs_root}/python${PYTHON_DOTLESS_VERSION}/libs/python${PYTHON_DOTLESS_VERSION}.lib
             ${Boost_LIBRARIES}
             )
     endif()
@@ -141,13 +161,20 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
 endfunction()
 
 
-
-function(build_python_module PROJECT_BUILD_TYPE)
+function(build_python_module PYTHON_REQUESTED_VERSION PROJECT_BUILD_TYPE)
+    if (PYTHON_REQUESTED_VERSION VERSION_EQUAL 2.7)
+        set(BOOST_REQUESTED_VERSION 1.67.0)
+        set(BOOST_ROOT "C:/local/boost_1_67_0")
+    else ()
+        set(BOOST_REQUESTED_VERSION 1.76.0)
+        set(BOOST_ROOT "C:/local/boost_1_76_0")
+    endif ()
+    message (STATUS "Python version: ${PYTHON_REQUESTED_VERSION}")
+    string (REPLACE "." "" PYTHON_DOTLESS_VERSION "${PYTHON_REQUESTED_VERSION}")
     set (CMAKE_BUILD_TYPE "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
-    set (HFS "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
-    find_package (Python 2.7 REQUIRED COMPONENTS Interpreter Development)
-    find_package (Boost REQUIRED COMPONENTS python27 system filesystem)
-    set (TARGET_NAME "${PROJECT_NAME}")
+    find_package (Python ${PYTHON_REQUESTED_VERSION} REQUIRED COMPONENTS Interpreter Development)
+    find_package (Boost ${BOOST_REQUESTED_VERSION} EXACT REQUIRED COMPONENTS python${PYTHON_DOTLESS_VERSION} system filesystem)
+    set (TARGET_NAME "${PROJECT_NAME}_python${PYTHON_DOTLESS_VERSION}")
     add_library (${TARGET_NAME} SHARED ${SRC})
     target_include_directories (
         ${TARGET_NAME}

@@ -1,80 +1,80 @@
-# escape=`
 #
 # Author:
 # Andriy Babak <ababak@gmail.com>
 #
 # Build the docker image:
-# docker build --rm -t cgcpp .
+# docker build --rm -f Dockerfile-python27 -t ababak/cgcpp:1.2 .
 # See README.md for details
-
 
 FROM mcr.microsoft.com/windows/servercore:ltsc2019 as base
 
 LABEL maintainer="ababak@gmail.com"
 
-# Restore the default Windows shell for correct batch processing.
-SHELL ["cmd", "/S", "/C"]
+SHELL ["powershell", "-ExecutionPolicy", "RemoteSigned", "-Command"]
 
-ADD https://aka.ms/vs/16/release/vs_buildtools.exe C:\TEMP\vs_buildtools.exe
-ADD https://aka.ms/vs/16/release/channel C:\TEMP\VisualStudio.chman
-
-# Install MSVC C++ compiler, CMake, and MSBuild.
-RUN C:\TEMP\vs_buildtools.exe `
-    --quiet --wait --norestart --nocache `
-    --installPath C:\BuildTools `
-    --channelUri C:\TEMP\VisualStudio.chman `
-    --installChannelUri C:\TEMP\VisualStudio.chman `
-    --add Microsoft.VisualStudio.Workload.VCTools `
-    --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended `
-    --add Microsoft.Component.MSBuild `
-    || IF "%ERRORLEVEL%"=="3010" EXIT 0
+# Install BuildTools
+RUN Invoke-WebRequest "https://aka.ms/vs/16/release/vs_buildtools.exe" -OutFile vs_buildtools.exe; \
+    Start-Process vs_buildtools.exe -Wait -ArgumentList '\
+    --quiet \
+    --wait \
+    --norestart \
+    --nocache \
+    --installPath C:/BuildTools \
+    --add Microsoft.VisualStudio.Workload.MSBuildTools \
+    --add Microsoft.VisualStudio.Workload.VCTools \ 
+    --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \ 
+    --add Microsoft.VisualStudio.Component.Windows10SDK.18362 \ 
+    --add Microsoft.VisualStudio.Component.VC.CMake.Project \ 
+    --add Microsoft.VisualStudio.Component.TestTools.BuildTools \ 
+    --add Microsoft.VisualStudio.Component.VC.ASAN \ 
+    --add Microsoft.VisualStudio.Component.VC.140'; \
+    Remove-Item c:/vs_buildtools.exe
 
 # Install Chocolatey package manager
-RUN powershell.exe -ExecutionPolicy RemoteSigned `
-    iex (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'); `
-    && SET "PATH=%PATH%;%ALLUSERSPROFILE%/chocolatey/bin"
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    iex (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
 
 # Install Chocolatey packages
-RUN powershell.exe -ExecutionPolicy RemoteSigned `
-    choco install python2 -y -o -ia "'/qn /norestart ALLUSERS=1 TARGETDIR=c:\Python27'"; `
-    choco install 7zip -y; `
-    choco install nasm -y; `
-    choco install git -y; `
-    choco install boost-msvc-14.1 --version 1.67.0 -y; `
-    choco install ninja -y
+RUN choco install -y \
+    7zip \
+    nasm \
+    openssh \
+    git
 
-RUN setx `
-    PATH "%PATH%;%PROGRAMFILES%/Git/bin;%PROGRAMFILES%/NASM;%PROGRAMFILES%/7-Zip;C:/Python27/Scripts"
-
-# Install Python packages
-RUN powershell.exe -ExecutionPolicy RemoteSigned `
-    python -m pip install --upgrade pip`
-    pyside `
-    pyopengl `
-    jinja2
+# Install Python
+RUN choco install -y \
+    python2
+RUN choco install -y \
+    python3 --version=3.9.13
 
 ENV PYTHONIOENCODING UTF-8
 
-# Install Chocolatey Boost package
-RUN powershell.exe -ExecutionPolicy RemoteSigned `
-    choco install boost-msvc-14.1 --version 1.67.0 -y
-ENV Boost_ROOT="C:\local\boost_1_67_0"
-# Overcome the Boost 1.67 build bug: https://github.com/boostorg/python/issues/193
-# Unfortunately, no neweer Boost versions available on Chocolatey: https://chocolatey.org/packages?q=boost
-RUN mklink %BOOST_ROOT%\lib64-msvc-14.1\boost_pythonPY_MAJOR_VERSIONPY_MINOR_VERSION-vc141-mt-gd-x64-1_67.lib %BOOST_ROOT%\lib64-msvc-14.1\libboost_python27-vc141-mt-gd-x64-1_67.lib `
-    && mklink %BOOST_ROOT%\lib64-msvc-14.1\libboost_pythonPY_MAJOR_VERSIONPY_MINOR_VERSION-vc141-mt-x64-1_67.lib %BOOST_ROOT%\lib64-msvc-14.1\libboost_python27-vc141-mt-x64-1_67.lib
+# Install Boost
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest "https://boost.teeks99.com/bin/1.67.0/boost_1_67_0-msvc-14.1-64.exe" -OutFile boost.exe; \
+    Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_67_0" /SILENT'; \
+    Remove-Item c:/boost.exe
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest "https://boost.teeks99.com/bin/1.76.0/boost_1_76_0-msvc-14.1-64.exe" -OutFile boost.exe; \
+    Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_76_0" /SILENT'; \
+    Remove-Item c:/boost.exe
 
-#######################################################
+RUN Set-Alias -Name python2 -Value C:/Python27/python.exe; \
+    Set-Alias -Name python3 -Value C:/Python39/python.exe
 
-COPY build.bat C:\build.bat
-COPY cmake C:\cmake
-RUN setx PATH "c:/cmake;%PATH%"
 ENV CMAKE_GENERATOR "NMake Makefiles"
+RUN setx /M PATH $( \
+    'c:/cmake' + ';' + \
+    $env:PATH + ';' + \
+    $env:PROGRAMFILES + '/NASM' \
+    )
+
+COPY cmake C:/cmake
+COPY build.bat C:/build.bat
 
 FROM base as prebuild
 
-
 WORKDIR /build
 
-ENTRYPOINT [ "C:\\BuildTools\\Common7\\Tools\\VsDevCmd.bat", "-arch=amd64", "&&" ]
-CMD [ "c:\\build.bat" ]
+ENTRYPOINT [ "C:/BuildTools/Common7/Tools/VsDevCmd.bat", "-arch=amd64", "&&" ]
+CMD [ "c:/build.bat" ]

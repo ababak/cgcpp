@@ -20,7 +20,7 @@ lib64
 __pycache__
 
 # Virtual environments
-venv
+venv*
 
 # Installer logs
 pip-log.txt

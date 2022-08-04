@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 31/05/2021
-modified: 04/06/2021 17:38:46
+modified: 04/08/2022 17:40:11
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -13,12 +13,33 @@ Containerized builds and runtime loading
 """
 
 import os
+import sys
 import inspect
 import platform
-from . import build
 from ._version import __version__
 
-__copyright__ = "(c) Andriy Babak 2021"
+__copyright__ = "(c) Andriy Babak 2021-2022"
+
+lib_loader_name = "lib_loader"
+lib_suffix = "_python{major}{minor}".format(
+    major=sys.version_info.major, minor=sys.version_info.minor,
+)
+lib_loader_path = "{folder}/{name}{suffix}.pyd".format(
+    folder=os.path.dirname(__file__), name=lib_loader_name, suffix=lib_suffix
+)
+try:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(lib_loader_name, lib_loader_path)
+    lib_loader = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(lib_loader)
+except ImportError:
+    import imp
+
+    with open(lib_loader_path, "rb") as f:
+        lib_loader = imp.load_module(
+            "lib_loader", f, lib_loader_path, (".pyd", "rb", 3)
+        )
 
 
 def get_library_path(lib_path, extra_frames=0):
@@ -48,20 +69,35 @@ def get_library_path(lib_path, extra_frames=0):
             if path:
                 lib_dir = os.path.dirname(path)
     full_lib_path = os.path.join(os.path.abspath(lib_dir), lib_name + lib_ext)
-    if not os.path.isfile(full_lib_path):
-        try:
-            import maya.cmds as cmds
-        except ImportError:
-            pass
-        else:
-            maya_version = str(cmds.about(v=True))
-            full_lib_path = os.path.join(
-                os.path.abspath(lib_dir), lib_name + "_maya" + maya_version + lib_ext
-            )
-            if os.path.isfile(full_lib_path):
-                return full_lib_path
-        raise AttributeError('Library not found: "' + full_lib_path + '"')
-    return full_lib_path
+    variants = [lib_name + lib_ext, lib_name + lib_suffix + lib_ext]
+    try:
+        from maya import cmds
+    except ImportError:
+        pass
+    else:
+        maya_version = str(cmds.about(v=True))
+        maya_suffix = "_maya" + maya_version
+        variants.append(lib_name + maya_suffix + lib_ext)
+        variants.append(lib_name + lib_suffix + maya_suffix + lib_ext)
+    try:
+        import hou
+        from hou import nodes
+    except ImportError:
+        pass
+    else:
+        houdini_version = os.path.splitext(hou.applicationVersionString())[0]
+        houdini_suffix = "_houdini" + houdini_version
+        variants.append(lib_name + houdini_suffix + lib_ext)
+        variants.append(lib_name + lib_suffix + houdini_suffix + lib_ext)
+    for name in variants:
+        full_lib_path = os.path.join(os.path.abspath(lib_dir), name)
+        if os.path.isfile(full_lib_path):
+            return full_lib_path
+    raise AttributeError(
+        'Library not found: "{}"'.format(
+            os.path.join(os.path.abspath(lib_dir), lib_name + lib_ext)
+        )
+    )
 
 
 def call(*args, **kwargs):
@@ -74,8 +110,6 @@ def call(*args, **kwargs):
     Usage:
         ret = cpp.call("some argument", some_named_argument=42, lib="/lib/path.so", func="custom")
     """
-    from . import lib_loader
-
     lib_path = kwargs.get("lib")
     func_name = kwargs.get("func")
     if not lib_path or not func_name:

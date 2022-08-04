@@ -2,7 +2,7 @@
  * (c) Andriy Babak 2021
  * 
  * date: 07/09/2020
- * modified: 31/05/2021 18:48:45
+ * modified: 04/08/2022 20:33:44
  * 
  * Author: Andriy Babak
  * e-mail: ababak@gmail.com
@@ -21,6 +21,12 @@ const std::string __version__ = "1.0.2";
 namespace py = boost::python;
 using lib_function_t = py::object(const py::tuple &, const py::dict &);
 
+#if BOOST_VERSION >= 107600 // 1.76.0
+    #define boost_dll_import boost::dll::import_symbol
+#else
+    #define boost_dll_import boost::dll::import
+#endif
+
 // Usage example:
 // >>> lib_loader.call(2, 3, lib="power.dll", func="pow")
 py::object call(const py::tuple &args, const py::dict &kwargs)
@@ -28,7 +34,7 @@ py::object call(const py::tuple &args, const py::dict &kwargs)
     boost::filesystem::path lib_path = (std::string)py::extract<std::string>(kwargs["lib"]);
     std::string function_name = py::extract<std::string>(kwargs["func"]);
     std::function<lib_function_t> lib_function;
-    lib_function = boost::dll::import<lib_function_t>(lib_path, function_name);
+    lib_function = boost_dll_import<lib_function_t>(lib_path, function_name);
     try
     {
         return lib_function(args, kwargs);

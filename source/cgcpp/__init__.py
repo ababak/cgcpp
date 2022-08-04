@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 31/05/2021
-modified: 04/08/2022 17:40:11
+modified: 04/08/2022 21:07:29
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -17,6 +17,7 @@ import sys
 import inspect
 import platform
 from ._version import __version__
+from . import build
 
 __copyright__ = "(c) Andriy Babak 2021-2022"
 

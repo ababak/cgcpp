@@ -2,7 +2,7 @@
  * (c) Andriy Babak 2022
  *
  * date: 05/08/2022
- * modified: 05/08/2022 17:13:48
+ * modified: 05/08/2022 18:55:46
  *
  * Author: Andriy Babak
  * e-mail: ababak@gmail.com
@@ -10,11 +10,11 @@
  * description: Sample Houdini module
  * ------------------------------
  * Call from Houdini Python:
- *      import cgcpp
- *      cgcpp.call("/obj", lib="houdini_module", func="ls")
- *
- *      # Result: ['/obj/box1', '/obj/sphere1']
- */
+ *      >>> import cgcpp
+ *      >>> cgcpp.call("/", lib="d:/cgcpp/out/houdini_module", func="ls")
+ *      ['/obj', '/out', '/ch', '/shop', '/img', '/img/comp1', '/vex', '/mat', '/stage', '/tasks', '/tasks/topnet1', '/tasks/topnet1/localscheduler']
+*/
+ 
 
 #include <iostream>
 #include <boost/format.hpp>
@@ -30,6 +30,15 @@
 using namespace std;
 namespace py = boost::python;
 
+py::object raise_attribute_error(const string &error_message)
+{
+    PyErr_SetString(
+        PyExc_AttributeError,
+        error_message.c_str());
+    py::throw_error_already_set();
+    return py::object();
+}
+
 void traverse(OP_Network *parent, py::list &result)
 {
     OP_Node *node;
@@ -43,7 +52,7 @@ void traverse(OP_Network *parent, py::list &result)
         cout << full_path << "\n";
         if (node->isNetwork())
         {
-            traverse(node, result);
+            traverse((OP_Network *)node, result);
         }
     }
 }

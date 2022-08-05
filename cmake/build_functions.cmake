@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2021
 # 
 # date: 08/09/2020
-# modified: 04/08/2022 18:05:28
+# modified: 05/08/2022 12:22:43
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -58,6 +58,12 @@ endfunction()
 
 
 function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
+    set (HFS "C:/sidefx/Houdini ${HOUDINI_VERSION}")
+    # CMAKE_PREFIX_PATH must contain the path to the toolkit/cmake subdirectory of
+    # the Houdini installation. See the "Compiling with CMake" section of the HDK
+    # documentation for more details, which describes several options for
+    # specifying this path.
+    list(APPEND CMAKE_PREFIX_PATH "${HFS}/toolkit/cmake")
     find_package (Houdini REQUIRED)
     if (Houdini_VERSION VERSION_LESS 19.5)
         set(PYTHON_REQUESTED_VERSION 2.7)
@@ -72,12 +78,6 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
     string (REPLACE "." "" PYTHON_DOTLESS_VERSION "${PYTHON_REQUESTED_VERSION}")
     set (CMAKE_BUILD_TYPE "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
     set (TARGET_NAME "${PROJECT_NAME}_python${PYTHON_DOTLESS_VERSION}")
-    set (HFS "C:/sidefx/Houdini ${HOUDINI_VERSION}")
-    # CMAKE_PREFIX_PATH must contain the path to the toolkit/cmake subdirectory of
-    # the Houdini installation. See the "Compiling with CMake" section of the HDK
-    # documentation for more details, which describes several options for
-    # specifying this path.
-    list(APPEND CMAKE_PREFIX_PATH "${HFS}/toolkit/cmake")
     find_package (Boost ${BOOST_REQUESTED_VERSION} EXACT REQUIRED COMPONENTS python${PYTHON_DOTLESS_VERSION} system filesystem)
     add_library (${TARGET_NAME} SHARED ${SRC})
     set_target_properties (${TARGET_NAME} PROPERTIES PREFIX "")

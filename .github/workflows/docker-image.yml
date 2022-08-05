@@ -23,8 +23,8 @@ jobs:
       - name: Set output variables
         id: vars
         run: |
-          echo ::set-output name=cgcpp_version::"$(python setup.py --version)"
-          echo ::set-output name=docker_tag::"$($(python setup.py --version) -replace '\.\w+$')"
+          echo "::set-output name=cgcpp_version::$(python setup.py --version)"
+          echo "::set-output name=docker_tag::$($(python setup.py --version) -replace '\.\w+$')"
 
       - name: Build Docker image
         run: docker build . --file Dockerfile --tag ababak/cgcpp:${{ steps.vars.outputs.docker_tag }}

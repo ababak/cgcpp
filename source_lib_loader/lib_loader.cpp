@@ -1,8 +1,8 @@
 /*
- * (c) Andriy Babak 2021
+ * (c) Andriy Babak 2021-2022
  * 
  * date: 07/09/2020
- * modified: 04/08/2022 20:33:44
+ * modified: 05/08/2022 17:15:49
  * 
  * Author: Andriy Babak
  * e-mail: ababak@gmail.com
@@ -16,7 +16,7 @@
 #include <boost/python.hpp>
 #include <boost/filesystem.hpp>
 
-const std::string __version__ = "1.0.2";
+const std::string __version__ = "1.0.3";
 
 namespace py = boost::python;
 using lib_function_t = py::object(const py::tuple &, const py::dict &);

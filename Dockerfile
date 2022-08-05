@@ -3,7 +3,7 @@
 # Andriy Babak <ababak@gmail.com>
 #
 # Build the docker image:
-# docker build --rm -f Dockerfile-python27 -t ababak/cgcpp:1.2 .
+# docker build --rm -t ababak/cgcpp:1.3 .
 # See README.md for details
 
 FROM mcr.microsoft.com/windows/servercore:ltsc2019 as base

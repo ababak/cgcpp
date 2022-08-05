@@ -1,4 +1,4 @@
-# docker run --rm -v "$(pwd -W):c:/source" -v "$(pwd -W)/../out:c:/out" cgcpp
+# docker run --rm -v "$(pwd -W):c:/source" -v "$(pwd -W)/../out:c:/out" ababak/cgcpp
 
 cmake_minimum_required (VERSION 3.16)
 find_package (init)

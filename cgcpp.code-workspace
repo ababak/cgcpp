@@ -48,7 +48,13 @@
 			"xstddef": "cpp",
 			"xtr1common": "cpp",
 			"xtree": "cpp",
-			"xutility": "cpp"
+			"xutility": "cpp",
+			"atomic": "cpp",
+			"bit": "cpp",
+			"clocale": "cpp",
+			"compare": "cpp",
+			"ctime": "cpp",
+			"iterator": "cpp"
 		},
 		"python.pythonPath": "venv\\Scripts\\python.exe"
 	}

@@ -20,8 +20,14 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ababak/cgcpp:latest
+      - name: Set output variables
+        id: vars
+        run: |
+          echo ::set-output name=cgcpp_version::"$(python setup.py --version)"
+          echo ::set-output name=docker_tag::"$($(python setup.py --version) -replace '\.\w+$')"
+
+      - name: Build Docker image
+        run: docker build . --file Dockerfile --tag ababak/cgcpp:${{ steps.vars.outputs.docker_tag }}
 
       - name: Push
-        run: docker push ababak/cgcpp:latest
+        run: docker push ababak/cgcpp:${{ steps.vars.outputs.docker_tag }}

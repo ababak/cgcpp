@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 03/06/2021
-modified: 04/08/2022 16:58:02
+modified: 05/08/2022 16:59:22
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -22,7 +22,7 @@ DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(__version__.split(".")[:2])
 
 
 def build(
-    source_dir, destination_dir=None, build_dir=None, maya_dir=None, sidefx_dir=None,
+    source_dir, destination_dir=None, build_dir=None, maya_dir=None, houdini_dir=None,
 ):
     """Run docker image to build source directory."""
     source_dir = os.path.abspath(source_dir).replace("\\", "/")
@@ -59,13 +59,13 @@ def build(
             return 1
         docker_args += ["-v", maya_dir + ":c:/autodesk:ro"]
         print('Autodesk Maya search directory: "{}"'.format(maya_dir))
-    if sidefx_dir:
-        sidefx_dir = os.path.abspath(sidefx_dir).replace("\\", "/")
-        if not os.path.isdir(sidefx_dir):
-            print('[ERROR] SideFX directory does not exist: "{}"'.format(sidefx_dir))
+    if houdini_dir:
+        houdini_dir = os.path.abspath(houdini_dir).replace("\\", "/")
+        if not os.path.isdir(houdini_dir):
+            print('[ERROR] SideFX directory does not exist: "{}"'.format(houdini_dir))
             return 1
-        docker_args += ["-v", sidefx_dir + ":c:/sidefx:ro"]
-        print('SideFX search directory: "{}"'.format(sidefx_dir))
+        docker_args += ["-v", houdini_dir + ":c:/sidefx:ro"]
+        print('SideFX search directory: "{}"'.format(houdini_dir))
     docker_args.append(DOCKER_IMAGE)
     subprocess.check_call(docker_args)
     return 0

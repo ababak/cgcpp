@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021-2022
 
 date: 01/06/2021
-modified: 04/08/2022 17:02:38
+modified: 05/08/2022 16:58:35
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -41,7 +41,7 @@ def main():
     )
     sidefx_default_directory = "C:/Program Files/Side Effects Software"
     parser.add_argument(
-        "--sidefx",
+        "--houdini",
         help='SideFX directory with Houdini installations. Default: "{}".'.format(
             sidefx_default_directory
         ),
@@ -58,7 +58,7 @@ def main():
         source_dir=source_dir,
         destination_dir=out_dir,
         maya_dir=args.maya,
-        sidefx_dir=args.sidefx,
+        houdini_dir=args.houdini,
     )
     if not result:
         sys.exit(result)

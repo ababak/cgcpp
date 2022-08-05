@@ -1,13 +1,13 @@
 /*
- * Animagrad (AMG)
+ * (c) Andriy Babak 2019-2022
  * 
  * date: 23/01/2019
- * modified: 25/05/2021 19:18:42
+ * modified: 05/08/2022 17:15:19
  * 
- * Author: Viktor Lavrentev
- * e-mail: viktor.lavrentev@animagrad.com
+ * Author: Andriy Babak
+ * e-mail: ababak@gmail.com
  * ------------------------------
- * description: Dynamic Library Loader
+ * description: Exception tesr
  * ------------------------------
  */
 
@@ -20,6 +20,7 @@ namespace py = boost::python;
 
 API py::object call(const py::tuple &args, const py::dict &kw)
 {
+    // Throw AttributeError("Some Error") exception
     PyErr_SetString(PyExc_AttributeError, "Some error");
     py::throw_error_already_set();
     return py::object();

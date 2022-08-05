@@ -1,18 +1,17 @@
 /*
- * Animagrad (AMG)
- * (c) Andriy Babak 2019
+ * (c) Andriy Babak 2019-2022
  * 
  * date: 10/01/2019
- * modified: 28/05/2021 17:19:15
+ * modified: 05/08/2022 13:12:07
  * 
  * Author: Andriy Babak
  * e-mail: ababak@gmail.com
  * ------------------------------
- * description: Python module for Maya polygon checking
+ * description: Sample Maya module
  * ------------------------------
- * Call from Maya Python:
- *      import cpp
- *      cpp.call("*", lib="maya_module", func="ls")
+  * Call from Maya Python:
+ *      import cgcpp
+ *      cgcpp.call("*", lib="maya_module", func="ls")
  *
  *      # Result: ['|front',
  *      '|front|frontShape',
@@ -26,7 +25,7 @@
  *      '|side|sideShape',
  *      '|top',
  *      '|top|topShape'] # 
- */
+*/
 
 #include <boost/format.hpp>
 #include <boost/python.hpp>

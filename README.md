@@ -1,3 +1,5 @@
+[![Docker Image CI](https://github.com/ababak/cgcpp/actions/workflows/docker-image.yml/badge.svg?branch=v1.4.0)](https://github.com/ababak/cgcpp/actions/workflows/docker-image.yml)
+
 # Computer Graphics C++ (cgcpp)
 A universal solution for common needs in C++ in computer graphics software.
 

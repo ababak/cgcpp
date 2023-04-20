@@ -45,7 +45,9 @@ RUN choco install -y \
 RUN choco install -y \
     python2
 RUN choco install -y \
-    python3 --version=3.9.13
+    python39
+RUN choco install -y \
+    python310
 
 ENV PYTHONIOENCODING UTF-8
 
@@ -57,6 +59,10 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest "https://boost.teeks99.com/bin/1.76.0/boost_1_76_0-msvc-14.1-64.exe" -OutFile boost.exe; \
     Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_76_0" /SILENT'; \
+    Remove-Item c:/boost.exe
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest "https://boost.teeks99.com/bin/1.80.0/boost_1_80_0-msvc-14.1-64.exe" -OutFile boost.exe; \
+    Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_80_0" /SILENT'; \
     Remove-Item c:/boost.exe
 
 RUN Set-Alias -Name python2 -Value C:/Python27/python.exe; \

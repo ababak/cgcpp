@@ -3,7 +3,7 @@
 # Andriy Babak <ababak@gmail.com>
 #
 # Build the docker image:
-# docker build --rm -t ababak/cgcpp:1.3 .
+# docker build --rm -t ababak/cgcpp:1.6 .
 # See README.md for details
 
 FROM mcr.microsoft.com/windows/servercore:ltsc2019 as base
@@ -64,9 +64,6 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     Invoke-WebRequest "https://boost.teeks99.com/bin/1.80.0/boost_1_80_0-msvc-14.1-64.exe" -OutFile boost.exe; \
     Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_80_0" /SILENT'; \
     Remove-Item c:/boost.exe
-
-RUN Set-Alias -Name python2 -Value C:/Python27/python.exe; \
-    Set-Alias -Name python3 -Value C:/Python39/python.exe
 
 ENV CMAKE_GENERATOR "NMake Makefiles"
 RUN setx /M PATH $( \

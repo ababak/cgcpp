@@ -1,8 +1,8 @@
 """
-(c) Andriy Babak 2021
+(c) Andriy Babak 2021-2024
 
 date: 31/05/2021
-modified: 20/04/2023 12:00:25
+modified: 30/05/2024 10:40:19
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -19,11 +19,12 @@ import platform
 from ._version import __version__
 from . import build
 
-__copyright__ = "(c) Andriy Babak 2021-2022"
+__copyright__ = "(c) Andriy Babak 2021-2024"
 
 lib_loader_name = "lib_loader"
 lib_suffix = "_python{major}{minor}".format(
-    major=sys.version_info.major, minor=sys.version_info.minor,
+    major=sys.version_info.major,
+    minor=sys.version_info.minor,
 )
 lib_loader_path = "{folder}/{name}{suffix}.pyd".format(
     folder=os.path.dirname(__file__), name=lib_loader_name, suffix=lib_suffix

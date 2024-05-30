@@ -3,10 +3,11 @@
 # Andriy Babak <ababak@gmail.com>
 #
 # Build the docker image:
-# docker build --rm -t ababak/cgcpp:1.6 .
+# docker build --rm -t ababak/cgcpp:1.7 .
 # See README.md for details
 
-FROM mcr.microsoft.com/windows/servercore:ltsc2019 as base
+# Chocolatey now requires .NET Framework 4.8
+FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc2019 as base
 
 LABEL maintainer="ababak@gmail.com"
 
@@ -43,19 +44,15 @@ RUN choco install -y \
 
 # Install Python
 RUN choco install -y \
-    python2
-RUN choco install -y \
     python39
 RUN choco install -y \
     python310
+RUN choco install -y \
+    python311
 
 ENV PYTHONIOENCODING UTF-8
 
 # Install Boost
-RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
-    Invoke-WebRequest "https://boost.teeks99.com/bin/1.67.0/boost_1_67_0-msvc-14.1-64.exe" -OutFile boost.exe; \
-    Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_67_0" /SILENT'; \
-    Remove-Item c:/boost.exe
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest "https://boost.teeks99.com/bin/1.76.0/boost_1_76_0-msvc-14.1-64.exe" -OutFile boost.exe; \
     Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_76_0" /SILENT'; \
@@ -63,6 +60,10 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest "https://boost.teeks99.com/bin/1.80.0/boost_1_80_0-msvc-14.1-64.exe" -OutFile boost.exe; \
     Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_80_0" /SILENT'; \
+    Remove-Item c:/boost.exe
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
+    Invoke-WebRequest "https://boost.teeks99.com/bin/1.82.0/boost_1_82_0-msvc-14.1-64.exe" -OutFile boost.exe; \
+    Start-Process boost.exe -Wait -ArgumentList '/DIR="C:/local/boost_1_82_0" /SILENT'; \
     Remove-Item c:/boost.exe
 
 ENV CMAKE_GENERATOR "NMake Makefiles"

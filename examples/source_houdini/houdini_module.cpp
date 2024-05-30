@@ -1,8 +1,8 @@
 /*
- * (c) Andriy Babak 2022
+ * (c) Andriy Babak 2022-2024
  *
  * date: 05/08/2022
- * modified: 05/08/2022 18:55:46
+ * modified: 30/05/2024 10:40:58
  *
  * Author: Andriy Babak
  * e-mail: ababak@gmail.com

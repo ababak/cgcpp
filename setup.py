@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 04/08/2022 17:50:02
+modified: 30/05/2024 11:23:44
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -72,7 +72,7 @@ class CMakeBuild(build_ext):
             docker_args = [
                 self.DOCKER_APP,
                 "build",
-                "--rm",
+                # "--rm",
                 "-t",
                 self.DOCKER_IMAGE,
                 ".",
@@ -129,18 +129,18 @@ class BuildPlugin(setuptools.Command):
 
 
 class BuildEgg(BuildEggCommand):
-    '''Custom egg build to ensure resources built.
+    """Custom egg build to ensure resources built.
 
     .. note::
 
         Required because when this project is a dependency for another project,
         only bdist_egg will be called and *not* build.
 
-    '''
+    """
 
     def run(self):
-        '''Run egg build ensuring build_resources called first.'''
-        self.run_command('build_ext')
+        """Run egg build ensuring build_resources called first."""
+        self.run_command("build_ext")
         BuildEggCommand.run(self)
 
 

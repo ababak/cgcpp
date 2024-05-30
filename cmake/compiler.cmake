@@ -1,4 +1,4 @@
-# (c) Andriy Babak 2020-2021
+# (c) Andriy Babak 2020-2024
 # 
 # date: 08/09/2020
 # modified: 28/05/2021 16:41:32

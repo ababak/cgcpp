@@ -11,5 +11,6 @@ endif (WIN32)
 build_python_module (3.9 "Release")
 build_python_module (3.10 "Release")
 build_python_module (3.11 "Release")
+build_python_module (3.12 "Release")
 
 message (STATUS "CMAKE_INSTALL_PREFIX is ${CMAKE_INSTALL_PREFIX}")

@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2024
 # 
 # date: 08/09/2020
-# modified: 30/05/2024 10:44:23
+# modified: 24/07/2024 13:34:57
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -175,27 +175,32 @@ endfunction()
 
 
 function(build_python_module PYTHON_REQUESTED_VERSION PROJECT_BUILD_TYPE)
+    string (REPLACE "." "" PYTHON_DOTLESS_VERSION "${PYTHON_REQUESTED_VERSION}")
+    message (STATUS "Python version: ${PYTHON_REQUESTED_VERSION}")
+    set (TARGET_NAME "${PROJECT_NAME}_python${PYTHON_DOTLESS_VERSION}")
+    set (CMAKE_BUILD_TYPE "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
+    message (STATUS "Target name: ${TARGET_NAME}")
     if (PYTHON_REQUESTED_VERSION VERSION_EQUAL 3.9)
-        set(Python_ROOT_DIR "C:/Python39")
-        set(BOOST_REQUESTED_VERSION 1.76.0)
-        set(BOOST_ROOT "C:/local/boost_1_76_0")
+        set (Python_ROOT_DIR "C:/Python39")
+        set (BOOST_REQUESTED_VERSION 1.76.0)
+        set (BOOST_ROOT "C:/local/boost_1_76_0")
     elseif (PYTHON_REQUESTED_VERSION VERSION_EQUAL 3.10)
-        set(Python_ROOT_DIR "C:/Python310")
-        set(BOOST_REQUESTED_VERSION 1.80.0)
-        set(BOOST_ROOT "C:/local/boost_1_80_0")
+        set (Python_ROOT_DIR "C:/Python310")
+        set (BOOST_REQUESTED_VERSION 1.80.0)
+        set (BOOST_ROOT "C:/local/boost_1_80_0")
     elseif (PYTHON_REQUESTED_VERSION VERSION_EQUAL 3.11)
-        set(Python_ROOT_DIR "C:/Python311")
-        set(BOOST_REQUESTED_VERSION 1.82.0)
-        set(BOOST_ROOT "C:/local/boost_1_82_0")
+        set (Python_ROOT_DIR "C:/Python311")
+        set (BOOST_REQUESTED_VERSION 1.82.0)
+        set (BOOST_ROOT "C:/local/boost_1_82_0")
+    elseif (PYTHON_REQUESTED_VERSION VERSION_EQUAL 3.12)
+        set (Python_ROOT_DIR "C:/Python312")
+        set (BOOST_REQUESTED_VERSION 1.85.0)
+        set (BOOST_ROOT "C:/local/boost_1_85_0")
     else ()
         message( FATAL_ERROR "Unsupported Python version: ${PYTHON_REQUESTED_VERSION}" )
     endif ()
-    message (STATUS "Python version: ${PYTHON_REQUESTED_VERSION}")
-    string (REPLACE "." "" PYTHON_DOTLESS_VERSION "${PYTHON_REQUESTED_VERSION}")
-    set (CMAKE_BUILD_TYPE "${PROJECT_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
     find_package (Python ${PYTHON_REQUESTED_VERSION} REQUIRED COMPONENTS Interpreter Development)
     find_package (Boost ${BOOST_REQUESTED_VERSION} EXACT REQUIRED COMPONENTS python${PYTHON_DOTLESS_VERSION} system filesystem)
-    set (TARGET_NAME "${PROJECT_NAME}_python${PYTHON_DOTLESS_VERSION}")
     add_library (${TARGET_NAME} SHARED ${SRC})
     target_include_directories (
         ${TARGET_NAME}

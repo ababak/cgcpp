@@ -1,8 +1,8 @@
 """
-(c) Andriy Babak 2021-2022
+(c) Andriy Babak 2021-2024
 
 date: 01/06/2021
-modified: 19/04/2023 16:39:35
+modified: 30/05/2024 10:40:16
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -11,7 +11,6 @@ description: CG C++ Support module
 ------------------------------
 """
 
-from __future__ import print_function, absolute_import
 import os
 import sys
 import argparse

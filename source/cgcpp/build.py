@@ -1,8 +1,8 @@
 """
-(c) Andriy Babak 2021
+(c) Andriy Babak 2021-2024
 
 date: 03/06/2021
-modified: 19/04/2023 16:38:38
+modified: 30/05/2024 10:40:26
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -11,7 +11,6 @@ description: CG C++ Support module
 ------------------------------
 """
 
-from __future__ import print_function
 import os
 import subprocess
 
@@ -22,7 +21,11 @@ DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(__version__.split(".")[:2])
 
 
 def build(
-    source_dir, destination_dir=None, build_dir=None, maya_dir=None, houdini_dir=None,
+    source_dir,
+    destination_dir=None,
+    build_dir=None,
+    maya_dir=None,
+    houdini_dir=None,
 ):
     """Run docker image to build source directory."""
     source_dir = os.path.abspath(source_dir).replace("\\", "/")

@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021-2024
 
 date: 01/06/2021
-modified: 30/05/2024 10:40:16
+modified: 30/01/2025 14:12:22
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -11,12 +11,11 @@ description: CG C++ Support module
 ------------------------------
 """
 
+import argparse
 import os
 import sys
-import argparse
 
-from . import __version__, __copyright__
-from . import build
+from . import __copyright__, __version__, build
 
 
 def main():
@@ -29,6 +28,7 @@ def main():
         "source", type=str, help="directory containing CMakeLists.txt to build"
     )
     parser.add_argument("--out", help="output directory")
+    parser.add_argument("--build", help="build directory")
     maya_default_directory = "C:/Program Files/Autodesk"
     parser.add_argument(
         "--maya",
@@ -49,6 +49,7 @@ def main():
     )
     args, unknownargs = parser.parse_known_args()
     source_dir = os.path.abspath(args.source).replace("\\", "/")
+    build_dir = args.build and os.path.abspath(args.build).replace("\\", "/")
     out_dir = os.path.abspath(args.out or source_dir).replace("\\", "/")
     if not os.path.isdir(args.source):
         print('[ERROR] Directory does not exist: "{}"'.format(source_dir))
@@ -56,6 +57,7 @@ def main():
     result = build.build(
         source_dir=source_dir,
         destination_dir=out_dir,
+        build_dir=build_dir,
         maya_dir=args.maya,
         houdini_dir=args.houdini,
     )

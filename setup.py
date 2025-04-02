@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 02/04/2025 13:03:56
+modified: 02/04/2025 13:31:23
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -12,14 +12,11 @@ description: CG C++ Support module
 """
 
 import os
-import re
-import shutil
 import subprocess
-import sys
+from pathlib import Path
 
 import setuptools
 import toml
-from setuptools.command.bdist_egg import bdist_egg as BuildEggCommand
 from setuptools.command.build_ext import build_ext
 
 
@@ -36,7 +33,7 @@ VERSION = get_version()
 class CMakeExtension(setuptools.Extension):
     def __init__(self, name, sourcedir=""):
         setuptools.Extension.__init__(self, name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
+        self.sourcedir = Path(sourcedir).absolute()
 
 
 class CMakeBuild(build_ext):
@@ -45,22 +42,21 @@ class CMakeBuild(build_ext):
     """
 
     DOCKER_APP = "docker"
-    DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(VERSION.split(".")[:2])
+    DOCKER_IMAGE = f"ababak/cgcpp:{'.'.join(VERSION.split('.')[:2])}"
 
     def run(self):
         try:
             out = subprocess.check_output([self.DOCKER_APP, "--version"])
         except OSError:
+            extensions = ", ".join(e.name for e in self.extensions)
             raise RuntimeError(
-                "Docker must be installed to build the following extensions: {extensions}".format(
-                    extensions=", ".join(e.name for e in self.extensions)
-                )
+                f"Docker must be installed to build the following extensions: {extensions}"
             )
         out = subprocess.check_output(
             [self.DOCKER_APP, "images", "-q", self.DOCKER_IMAGE]
         )
         if not out:
-            print('Building docker image "{}"...'.format(self.DOCKER_IMAGE))
+            print(f'Building docker image "{self.DOCKER_IMAGE}"...')
             docker_args = [
                 self.DOCKER_APP,
                 "build",
@@ -74,21 +70,19 @@ class CMakeBuild(build_ext):
             self.build_extension(ext)
 
     def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
-        if not os.path.exists(extdir):
+        extdir = Path(self.get_ext_fullpath(ext.name)).parent.absolute()
+        if not extdir.exists():
             os.makedirs(extdir)
         sourcedir = ext.sourcedir
-        print(
-            'Building extension "{}" using "{}"...'.format(ext.name, self.DOCKER_IMAGE)
-        )
+        print(f'Building extension "{ext.name}" using "{self.DOCKER_IMAGE}"...')
         docker_args = [
             self.DOCKER_APP,
             "run",
             "--rm",
             "-v",
-            "{}:c:/source:ro".format(sourcedir),
+            f"{sourcedir}:c:/source:ro",
             "-v",
-            "{}:c:/out".format(os.path.abspath(extdir)),
+            f"{extdir}:c:/out",
             self.DOCKER_IMAGE,
         ]
         subprocess.check_call(docker_args)

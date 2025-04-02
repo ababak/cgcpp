@@ -3,7 +3,9 @@ name: Docker Image CI
 on:
   push:
     tags:
-      - "v*.*.*"
+      # Building Docker image requires a v.X.X.0 tag
+      # The Docker image is tagged with the version number
+      - "v*.*.0"
 
 jobs:
   build:

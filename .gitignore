@@ -25,6 +25,9 @@ venv*
 # Installer logs
 pip-log.txt
 
+# NOX
+.nox
+
 # Unit test / coverage reports
 .coverage
 .tox

@@ -3,9 +3,9 @@
 # Andriy Babak <ababak@gmail.com>
 #
 # Build the docker image:
-# docker build --rm -t ababak/cgcpp:1.7 .
-# docker run --rm -v "$(pwd):c:/source:ro" -r "$(pwd)/out:c:/out" ababak/cgcpp:1.7
-# docker run --rm -v "$(pwd -W):c:/source:ro" -v "$(pwd -W)/out:c:/out" ababak/cgcpp:1.7
+# docker build --rm -t ababak/cgcpp:1.8 .
+# docker run --rm -v "$(pwd):c:/source:ro" -r "$(pwd)/out:c:/out" ababak/cgcpp:1.8
+# docker run --rm -v "$(pwd -W):c:/source:ro" -v "$(pwd -W)/out:c:/out" ababak/cgcpp:1.8
 # See README.md for details
 
 FROM ababak/boost:latest as base

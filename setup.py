@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 24/07/2024 10:15:50
+modified: 02/04/2025 12:25:46
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -12,15 +12,16 @@ description: CG C++ Support module
 """
 
 from __future__ import print_function
+
 import os
 import re
-import sys
 import shutil
 import subprocess
+import sys
 
-from setuptools.command.build_ext import build_ext
-from setuptools.command.bdist_egg import bdist_egg as BuildEggCommand
 import setuptools
+from setuptools.command.bdist_egg import bdist_egg as BuildEggCommand
+from setuptools.command.build_ext import build_ext
 
 # Define paths
 
@@ -42,18 +43,13 @@ STAGING_PATH = STAGING_PATH.format(VERSION)
 
 
 class CMakeExtension(setuptools.Extension):
-    def __init__(self, name, sourcedir=""):
-        setuptools.Extension.__init__(self, name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
-
-
-class CMakeBuild(build_ext):
-    """
-    Build CMake using docker image
-    """
 
     DOCKER_APP = "docker"
     DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(VERSION.split(".")[:2])
+
+    def __init__(self, name, sourcedir=""):
+        setuptools.Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
 
     def run(self):
         try:
@@ -102,66 +98,7 @@ class CMakeBuild(build_ext):
         subprocess.check_call(docker_args)
 
 
-# Custom commands.
-class BuildPlugin(setuptools.Command):
-    """Build plugin."""
-
-    description = "Build plugin and create an archive"
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        """Run the build step."""
-        # Clean staging path
-        shutil.rmtree(STAGING_PATH, ignore_errors=True)
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", ".", "--target", STAGING_PATH]
-        )
-        # Generate plugin zip
-        shutil.make_archive(
-            os.path.join(BUILD_PATH, PLUGIN_NAME.format(VERSION)), "zip", STAGING_PATH
-        )
-
-
-class BuildEgg(BuildEggCommand):
-    """Custom egg build to ensure resources built.
-
-    .. note::
-
-        Required because when this project is a dependency for another project,
-        only bdist_egg will be called and *not* build.
-
-    """
-
-    def run(self):
-        """Run egg build ensuring build_resources called first."""
-        self.run_command("build_ext")
-        BuildEggCommand.run(self)
-
-
 # Configuration.
 setuptools.setup(
-    name="cgcpp",
-    version=VERSION,
-    description="CG C++ Support module.",
-    long_description=open(README_PATH).read(),
-    keywords="",
-    url="https://github.com/ababak/cgcpp",
-    author="Andriy Babak",
-    author_email="ababak@gmail.com",
-    license="Apache License (2.0)",
-    packages=setuptools.find_packages(SOURCE_PATH),
-    package_dir={"": "source"},
     ext_modules=[CMakeExtension("cgcpp/lib_loader", "source_lib_loader")],
-    cmdclass={
-        "build_ext": CMakeBuild,
-        "bdist_egg": BuildEgg,
-        "build_plugin": BuildPlugin,
-    },
-    zip_safe=False,
 )

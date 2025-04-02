@@ -1,8 +1,8 @@
 """
-(c) Andriy Babak 2021-2024
+(c) Andriy Babak 2021-2025
 
 date: 31/05/2021
-modified: 30/05/2024 10:40:19
+modified: 02/04/2025 12:27:27
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -12,14 +12,17 @@ Containerized builds and runtime loading
 ------------------------------
 """
 
-import os
-import sys
+import importlib.metadata
 import inspect
+import os
 import platform
-from ._version import __version__
+import sys
+
 from . import build
 
-__copyright__ = "(c) Andriy Babak 2021-2024"
+__version__ = importlib.metadata.version("cgcpp")
+
+__copyright__ = "(c) Andriy Babak 2021-2025"
 
 lib_loader_name = "lib_loader"
 lib_suffix = "_python{major}{minor}".format(
@@ -72,11 +75,13 @@ def get_library_path(lib_path, extra_frames=0):
                 lib_dir = os.path.dirname(path)
     full_lib_path = os.path.join(os.path.abspath(lib_dir), lib_name + lib_ext)
     variants = [lib_name + lib_ext, lib_name + lib_suffix + lib_ext]
+    # Try to guess the host application
     try:
         from maya import cmds
     except ImportError:
         pass
     else:
+        # The host application is Maya
         maya_version = str(cmds.about(v=True))
         maya_suffix = "_maya" + maya_version
         variants.append(lib_name + maya_suffix + lib_ext)
@@ -87,6 +92,7 @@ def get_library_path(lib_path, extra_frames=0):
     except ImportError:
         pass
     else:
+        # The host application is Houdini
         houdini_version = os.path.splitext(hou.applicationVersionString())[0]
         houdini_suffix = "_houdini" + houdini_version
         variants.append(lib_name + houdini_suffix + lib_ext)

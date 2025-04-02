@@ -1,0 +1,19 @@
+[project]
+dependencies = []
+name = "cgcpp"
+version = "1.8.0"
+description = "CG C++ Support module"
+authors = [{ name = "Andriy Babak", email = "ababak@gmail.com" }]
+license = { text = "Apache License (2.0)" }
+readme = { file = "README.md", content-type = "text/markdown" }
+
+[project.urls]
+Homepage = "https://github.com/ababak/cgcpp"
+Repository = "https://github.com/ababak/cgcpp.git"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["source/"]

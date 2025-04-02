@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 02/04/2025 12:25:46
+modified: 02/04/2025 13:03:56
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -11,8 +11,6 @@ description: CG C++ Support module
 ------------------------------
 """
 
-from __future__ import print_function
-
 import os
 import re
 import shutil
@@ -20,36 +18,34 @@ import subprocess
 import sys
 
 import setuptools
+import toml
 from setuptools.command.bdist_egg import bdist_egg as BuildEggCommand
 from setuptools.command.build_ext import build_ext
 
-# Define paths
 
-PLUGIN_NAME = "cgcpp-{0}"
-
-ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
-SOURCE_PATH = os.path.join(ROOT_PATH, "source")
-README_PATH = os.path.join(ROOT_PATH, "README.md")
-BUILD_PATH = os.path.join(ROOT_PATH, "build")
-STAGING_PATH = os.path.join(BUILD_PATH, PLUGIN_NAME)
-
-with open(os.path.join(SOURCE_PATH, "cgcpp", "_version.py")) as _version_file:
-    VERSION = re.match(
-        r".*__version__ = [\'\"](.*?)[\'\"]", _version_file.read(), re.DOTALL
-    ).group(1)
+def get_version() -> str:
+    """Read package version from the pyproject.toml file."""
+    with open("pyproject.toml", encoding="utf-8") as fd:
+        pyproject = toml.load(fd)
+    return pyproject["project"]["version"]
 
 
-STAGING_PATH = STAGING_PATH.format(VERSION)
+VERSION = get_version()
 
 
 class CMakeExtension(setuptools.Extension):
-
-    DOCKER_APP = "docker"
-    DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(VERSION.split(".")[:2])
-
     def __init__(self, name, sourcedir=""):
         setuptools.Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
+
+
+class CMakeBuild(build_ext):
+    """
+    Build CMake using docker image
+    """
+
+    DOCKER_APP = "docker"
+    DOCKER_IMAGE = "ababak/cgcpp:" + ".".join(VERSION.split(".")[:2])
 
     def run(self):
         try:
@@ -101,4 +97,8 @@ class CMakeExtension(setuptools.Extension):
 # Configuration.
 setuptools.setup(
     ext_modules=[CMakeExtension("cgcpp/lib_loader", "source_lib_loader")],
+    cmdclass={
+        "build_ext": CMakeBuild,
+    },
+    zip_safe=False,
 )

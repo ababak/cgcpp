@@ -26,7 +26,7 @@ jobs:
           echo "DOCKER_TAG=$('${{ github.ref_name }}' -replace '^v', '' -replace '\.\w+$', '')" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
-        run: docker build . --file Dockerfile --tag ababak/cgcpp:$DOCKER_TAG
+        run: docker build . --file Dockerfile --tag ababak/cgcpp:${{ steps.vars.outputs.DOCKER_TAG }}
 
       - name: Push
-        run: docker push ababak/cgcpp:$DOCKER_TAG
+        run: docker push ababak/cgcpp:${{ steps.vars.outputs.DOCKER_TAG }}

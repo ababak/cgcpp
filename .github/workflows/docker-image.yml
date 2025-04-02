@@ -15,7 +15,7 @@ jobs:
 
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
@@ -23,10 +23,10 @@ jobs:
       - name: Set output variables
         id: vars
         run: |
-          echo "docker_tag=$('${{ github.ref_name }}' -replace '^v', '' -replace '\.\w+$', '')" >> $GITHUB_OUTPUT
+          echo "DOCKER_TAG=$('${{ github.ref_name }}' -replace '^v', '' -replace '\.\w+$', '')" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
-        run: docker build . --file Dockerfile --tag ababak/cgcpp:${{ steps.vars.outputs.docker_tag }}
+        run: docker build . --file Dockerfile --tag ababak/cgcpp:$DOCKER_TAG
 
       - name: Push
-        run: docker push ababak/cgcpp:${{ steps.vars.outputs.docker_tag }}
+        run: docker push ababak/cgcpp:$DOCKER_TAG

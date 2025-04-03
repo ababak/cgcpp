@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021-2025
 
 date: 31/05/2021
-modified: 02/04/2025 12:27:27
+modified: 03/04/2025 12:10:58
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -13,55 +13,43 @@ Containerized builds and runtime loading
 """
 
 import importlib.metadata
+import importlib.util
 import inspect
 import os
 import platform
 import sys
+from pathlib import Path
+
+__version__ = importlib.metadata.version("cgcpp")
+__copyright__ = "(c) Andriy Babak 2021-2025"
 
 from . import build
 
-__version__ = importlib.metadata.version("cgcpp")
-
-__copyright__ = "(c) Andriy Babak 2021-2025"
-
 lib_loader_name = "lib_loader"
-lib_suffix = "_python{major}{minor}".format(
-    major=sys.version_info.major,
-    minor=sys.version_info.minor,
-)
-lib_loader_path = "{folder}/{name}{suffix}.pyd".format(
-    folder=os.path.dirname(__file__), name=lib_loader_name, suffix=lib_suffix
-)
-try:
-    import importlib.util
+lib_suffix = f"_python{sys.version_info.major}{sys.version_info.minor}"
+lib_loader_path = Path(__file__).with_name(f"{lib_loader_name}{lib_suffix}.pyd")
 
-    spec = importlib.util.spec_from_file_location(lib_loader_name, lib_loader_path)
-    lib_loader = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(lib_loader)
-except ImportError:
-    import imp
-
-    with open(lib_loader_path, "rb") as f:
-        lib_loader = imp.load_module(
-            "lib_loader", f, lib_loader_path, (".pyd", "rb", 3)
-        )
+spec = importlib.util.spec_from_file_location(lib_loader_name, lib_loader_path)
+lib_loader = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(lib_loader)
 
 
 def get_library_path(lib_path, extra_frames=0):
     """
     Try to guess a full library path
     """
-    lib_dir = os.path.dirname(lib_path)
+    lib_path = Path(lib_path)
+    lib_dir = lib_path.parent
     lib_name = os.path.basename(lib_path)
-    lib_name, lib_ext = os.path.splitext(lib_name)
+    lib_name, lib_ext = os.path.splitext(lib_path.name)
     local_platform = platform.system().lower()
     if local_platform == "windows":
         lib_ext = ".dll"
     elif local_platform == "linux":
         lib_ext = ".so"
     else:
-        raise EnvironmentError("Unsupported platform: %s", local_platform)
-    if not lib_dir:
+        raise EnvironmentError(f"Unsupported platform: {local_platform}")
+    if not os.path.dirname(lib_path):
         # get call stack frames
         frames = inspect.stack(0)
         frame = 1 + extra_frames
@@ -72,9 +60,9 @@ def get_library_path(lib_path, extra_frames=0):
         if len(frames) > frame:
             path = frames[frame][1]
             if path:
-                lib_dir = os.path.dirname(path)
-    full_lib_path = os.path.join(os.path.abspath(lib_dir), lib_name + lib_ext)
-    variants = [lib_name + lib_ext, lib_name + lib_suffix + lib_ext]
+                lib_dir = Path(path).parent
+    full_lib_path = lib_dir.absolute() / f"{lib_name}{lib_ext}"
+    variants = [f"{lib_name}{lib_ext}", f"{lib_name}{lib_suffix}{lib_ext}"]
     # Try to guess the host application
     try:
         from maya import cmds
@@ -82,10 +70,10 @@ def get_library_path(lib_path, extra_frames=0):
         pass
     else:
         # The host application is Maya
-        maya_version = str(cmds.about(v=True))
-        maya_suffix = "_maya" + maya_version
-        variants.append(lib_name + maya_suffix + lib_ext)
-        variants.append(lib_name + lib_suffix + maya_suffix + lib_ext)
+        maya_version = cmds.about(v=True)
+        maya_suffix = f"_maya{maya_version}"
+        variants.append(f"{lib_name}{maya_suffix}{lib_ext}")
+        variants.append(f"{lib_name}{lib_suffix}{maya_suffix}{lib_ext}")
     try:
         import hou
         from hou import nodes
@@ -94,17 +82,15 @@ def get_library_path(lib_path, extra_frames=0):
     else:
         # The host application is Houdini
         houdini_version = os.path.splitext(hou.applicationVersionString())[0]
-        houdini_suffix = "_houdini" + houdini_version
-        variants.append(lib_name + houdini_suffix + lib_ext)
-        variants.append(lib_name + lib_suffix + houdini_suffix + lib_ext)
+        houdini_suffix = f"_houdini{houdini_version}"
+        variants.append(f"{lib_name}{houdini_suffix}{lib_ext}")
+        variants.append(f"{lib_name}{lib_suffix}{houdini_suffix}{lib_ext}")
     for name in variants:
-        full_lib_path = os.path.join(os.path.abspath(lib_dir), name)
-        if os.path.isfile(full_lib_path):
+        full_lib_path = lib_dir.absolute() / name
+        if full_lib_path.is_file():
             return full_lib_path
     raise AttributeError(
-        'Library not found: "{}"'.format(
-            os.path.join(os.path.abspath(lib_dir), lib_name + lib_ext)
-        )
+        f'Library not found: "{lib_dir.absolute().with_name(lib_name + lib_ext)}"'
     )
 
 
@@ -123,5 +109,5 @@ def call(*args, **kwargs):
     if not lib_path or not func_name:
         raise AttributeError('Invalid usage. Expected arguments: "lib", "func"')
     modified_kwargs = dict(kwargs)
-    modified_kwargs["lib"] = get_library_path(lib_path, extra_frames=1)
+    modified_kwargs["lib"] = get_library_path(lib_path, extra_frames=1).as_posix()
     return lib_loader.call(*args, **modified_kwargs)

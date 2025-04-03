@@ -1,7 +1,7 @@
 [project]
 dependencies = []
 name = "cgcpp"
-version = "1.8.0"
+version = "1.8.1"
 description = "CG C++ Support module"
 authors = [{ name = "Andriy Babak", email = "ababak@gmail.com" }]
 license = "Apache-2.0"

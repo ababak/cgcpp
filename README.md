@@ -8,7 +8,7 @@ A universal solution for common needs in C++ in computer graphics software.
 - Python 3.10, Boost 1.80.0 on Windows
 - Python 3.11, Boost 1.82.0 on Windows
 - Python 3.12, Boost 1.85.0 on Windows
-- Autodesk Maya 2023-2025 on Windows *(Python 3.9 and Boost 1.76.0 in Maya 2023, Python 3.10 and Boost 1.80.0 in Maya 2024, Python 3.11 and Boost 1.82.0 in Maya 2025, Python 3.11 and Boost 1.85.0 in Maya 2026)*
+- Autodesk Maya 2023-2026 on Windows *(Python 3.9 and Boost 1.76.0 in Maya 2023, Python 3.10 and Boost 1.80.0 in Maya 2024, Python 3.11 and Boost 1.82.0 in Maya 2025, Python 3.11 and Boost 1.85.0 in Maya 2026)*
 - SideFX Houdini 19.5-20.5 on Windows *(Python 3.9 and Boost 1.76.0 in Houdini 19.5, Python 3.10 and Boost 1.80.0 in Houdini 20.0, Python 3.11 and Boost 1.82.0 in Houdini 20.5)*
 
 Support for other platforms and other DCC applications may come later.

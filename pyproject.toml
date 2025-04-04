@@ -12,8 +12,11 @@ Homepage = "https://github.com/ababak/cgcpp"
 Repository = "https://github.com/ababak/cgcpp.git"
 
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "toml"]
+requires = ["setuptools>=61.0", "wheel", "build", "toml"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["source/"]
+where = ["source"]
+
+# [tool.setuptools.package-data]
+# "*" = ["*.*"] # <-- this changed

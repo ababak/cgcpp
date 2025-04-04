@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 04/04/2025 11:01:38
+modified: 04/04/2025 15:32:12
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -12,6 +12,7 @@ description: CG C++ Support module
 """
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -29,6 +30,9 @@ def get_version() -> str:
 
 
 VERSION = get_version()
+ROOT_PATH = Path(__file__).parent.absolute()
+SOURCE_PATH = ROOT_PATH / "source"
+BUILD_PATH = ROOT_PATH / "build"
 
 
 class BdistWheelCommand(bdist_wheel):
@@ -46,12 +50,6 @@ class BdistWheelCommand(bdist_wheel):
         return impl, abi, plat
 
 
-class CMakeExtension(setuptools.Extension):
-    def __init__(self, name, sourcedir=""):
-        setuptools.Extension.__init__(self, name, sources=[])
-        self.sourcedir = Path(sourcedir).absolute()
-
-
 class CMakeBuild(build_ext):
     """
     Build CMake using docker image
@@ -61,6 +59,8 @@ class CMakeBuild(build_ext):
     DOCKER_IMAGE = f"ababak/cgcpp:{'.'.join(VERSION.split('.')[:2])}"
 
     def run(self):
+        """Prepare the Docker image and run the build."""
+        # Check if Docker is installed
         try:
             out = subprocess.check_output([self.DOCKER_APP, "--version"])
         except OSError:
@@ -68,37 +68,56 @@ class CMakeBuild(build_ext):
             raise RuntimeError(
                 f"Docker must be installed to build the following extensions: {extensions}"
             )
+        # Check if the image is available
         out = subprocess.check_output(
             [self.DOCKER_APP, "images", "-q", self.DOCKER_IMAGE]
         )
         if not out:
-            print(f'Building docker image "{self.DOCKER_IMAGE}"...')
-            docker_args = [
-                self.DOCKER_APP,
-                "build",
-                # "--rm",
-                "-t",
-                self.DOCKER_IMAGE,
-                ".",
-            ]
-            subprocess.check_call(docker_args)
-        for ext in self.extensions:
-            self.build_extension(ext)
+            # Try to pull the image from Docker Hub
+            try:
+                print(f'Trying to pull the docker image "{self.DOCKER_IMAGE}"...')
+                out = subprocess.check_output(
+                    [self.DOCKER_APP, "pull", self.DOCKER_IMAGE]
+                )
+                print(f'Pulled the docker image "{self.DOCKER_IMAGE}"...')
+            except subprocess.CalledProcessError:
+                # If the image is not available, build it from the Dockerfile
+                print(f'Building docker image "{self.DOCKER_IMAGE}"...')
+                docker_args = [
+                    self.DOCKER_APP,
+                    "build",
+                    # "--rm",
+                    "-t",
+                    self.DOCKER_IMAGE,
+                    ".",
+                ]
+                subprocess.check_call(docker_args)
+        super().run()
 
     def build_extension(self, ext):
-        extdir = Path(self.get_ext_fullpath(ext.name)).parent.absolute()
-        if not extdir.exists():
-            os.makedirs(extdir)
-        sourcedir = ext.sourcedir
+        staging_path = Path(self.get_ext_fullpath(ext.name)).parent.absolute()
+        if not staging_path.exists():
+            os.makedirs(staging_path)
+        # relative_file_path = Path(dirpath).relative_to(SOURCE_PATH)
+        # source_path = dirpath
+        # destination_path = (staging_path / relative_file_path).parent
+        # for i, j in ext.__dict__.items():
+        #     print(f"{i} = {j}")
+        print("staging_path", staging_path)
+        sdir = Path(__file__).parent
+        sources_path = os.path.commonpath(ext.sources)
+        source_dir = sdir / sources_path
+        print("sdir", sdir)
+        print("source_dir", source_dir)
         print(f'Building extension "{ext.name}" using "{self.DOCKER_IMAGE}"...')
         docker_args = [
             self.DOCKER_APP,
             "run",
             "--rm",
             "-v",
-            f"{sourcedir}:c:/source:ro",
+            f"{source_dir}:c:/source:ro",
             "-v",
-            f"{extdir}:c:/out",
+            f"{staging_path}:c:/out",
             self.DOCKER_IMAGE,
         ]
         subprocess.check_call(docker_args)
@@ -106,11 +125,18 @@ class CMakeBuild(build_ext):
 
 # Configuration.
 setuptools.setup(
-    ext_modules=[CMakeExtension("cgcpp/lib_loader", "source_lib_loader")],
+    ext_modules=[
+        setuptools.Extension(
+            "cgcpp.lib_loader",
+            sources=[
+                "source_lib_loader/lib_loader.cpp",
+                "source_lib_loader/CMakeLists.txt",
+            ],
+        )
+    ],
     cmdclass={
         "build_ext": CMakeBuild,
         "bdist_wheel": BdistWheelCommand,
     },
-    include_package_data=True,
     zip_safe=False,
 )

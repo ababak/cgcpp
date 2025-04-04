@@ -1,4 +1,4 @@
-name: Build and Publish Wheels
+name: Build and Publish Test Wheels
 
 on:
   # push:

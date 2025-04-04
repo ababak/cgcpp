@@ -1,12 +1,13 @@
 name: Docker Image CI
 
 on:
-  push:
-    tags:
-      # Building Docker image requires a v.X.X.0 tag
-      # The Docker image is tagged with the version number
-      - "v*.*.0"
-
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag to use (e.g. v1.2.3)'
+        required: true
+        default: ''
+    
 jobs:
   build:
     runs-on: windows-2019
@@ -25,8 +26,12 @@ jobs:
       - name: Set output variables
         id: vars
         run: |
-          echo "DOCKER_TAG=$('${{ github.ref_name }}' -replace '^v', '' -replace '\.\w+$', '')" >> $env:GITHUB_OUTPUT
-
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            echo "DOCKER_TAG=${{ github.event.inputs.version }}" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "DOCKER_TAG=$('${{ github.ref_name }}' -replace '^v', '' -replace '\.\w+$', '')" >> $env:GITHUB_OUTPUT
+          }
+          
       - name: Build Docker image
         run: docker build . --file Dockerfile --tag ababak/cgcpp:${{ steps.vars.outputs.DOCKER_TAG }}
 

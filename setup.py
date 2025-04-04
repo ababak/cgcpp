@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 02/04/2025 13:31:23
+modified: 04/04/2025 11:01:38
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -18,6 +18,7 @@ from pathlib import Path
 import setuptools
 import toml
 from setuptools.command.build_ext import build_ext
+from wheel.bdist_wheel import bdist_wheel
 
 
 def get_version() -> str:
@@ -28,6 +29,21 @@ def get_version() -> str:
 
 
 VERSION = get_version()
+
+
+class BdistWheelCommand(bdist_wheel):
+    def finalize_options(self):
+        super().finalize_options()
+        # Mark the wheel as compatible with any Python 3
+        self.root_is_pure = False
+        self.py_limited_api = False
+
+    def get_tag(self):
+        # Override the wheel tag to be platform-specific but Python-version agnostic
+        impl = "py3"
+        abi = "none"
+        plat = self.plat_name.replace("-", "_").replace(".", "_")
+        return impl, abi, plat
 
 
 class CMakeExtension(setuptools.Extension):
@@ -93,6 +109,8 @@ setuptools.setup(
     ext_modules=[CMakeExtension("cgcpp/lib_loader", "source_lib_loader")],
     cmdclass={
         "build_ext": CMakeBuild,
+        "bdist_wheel": BdistWheelCommand,
     },
+    include_package_data=True,
     zip_safe=False,
 )

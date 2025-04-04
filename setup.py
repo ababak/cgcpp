@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021
 
 date: 28/05/2021
-modified: 04/04/2025 11:01:38
+modified: 04/04/2025 12:16:21
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -72,16 +72,23 @@ class CMakeBuild(build_ext):
             [self.DOCKER_APP, "images", "-q", self.DOCKER_IMAGE]
         )
         if not out:
-            print(f'Building docker image "{self.DOCKER_IMAGE}"...')
-            docker_args = [
-                self.DOCKER_APP,
-                "build",
-                # "--rm",
-                "-t",
-                self.DOCKER_IMAGE,
-                ".",
-            ]
-            subprocess.check_call(docker_args)
+            try:
+                print(f'Trying to pull the docker image "{self.DOCKER_IMAGE}"...')
+                out = subprocess.check_output(
+                    [self.DOCKER_APP, "pull", self.DOCKER_IMAGE]
+                )
+                print(f'Pulled the docker image "{self.DOCKER_IMAGE}"...')
+            except subprocess.CalledProcessError:
+                print(f'Building docker image "{self.DOCKER_IMAGE}"...')
+                docker_args = [
+                    self.DOCKER_APP,
+                    "build",
+                    # "--rm",
+                    "-t",
+                    self.DOCKER_IMAGE,
+                    ".",
+                ]
+                subprocess.check_call(docker_args)
         for ext in self.extensions:
             self.build_extension(ext)
 

@@ -30,13 +30,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install wheel setuptools toml
           
-      - name: Build extensions using Docker
-        run: |
-          python setup.py build_ext
-          
       - name: Build universal wheel
         run: |
-          python setup.py bdist_wheel
+          python -m build
           
       - name: Upload wheel as artifact
         uses: actions/upload-artifact@v3
@@ -44,12 +40,7 @@ jobs:
           name: wheel
           path: dist/*.whl
           
-      # - name: Publish to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     password: ${{ secrets.PYPI_API_TOKEN }}
-      - name: Publish to TestPyPI
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          repository-url: https://test.pypi.org/legacy/
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          password: ${{ secrets.PYPI_API_TOKEN }}

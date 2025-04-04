@@ -1,13 +1,16 @@
-name: Build and Publish Wheels Test
+name: Build and Publish Wheels
 
 on:
+  # push:
+  #   tags:
+  #     - "v*.*.*"
   workflow_dispatch:
     inputs:
       tag:
         description: 'Version tag to use (e.g. v1.2.3)'
         required: true
         default: ''
-
+        
 jobs:
   build_wheels:
     name: Build Universal Wheel
@@ -27,16 +30,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install wheel setuptools toml
           
-      - name: Build extensions using Docker
-        run: |
-          python setup.py build_ext
-          
       - name: Build universal wheel
         run: |
-          python setup.py bdist_wheel
+          python -m build
           
       - name: Upload wheel as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: wheel
           path: dist/*.whl

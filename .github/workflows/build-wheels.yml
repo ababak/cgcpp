@@ -41,7 +41,7 @@ jobs:
           path: dist/*.whl
           
   publish:
-    name: Publish to TestPyPI
+    name: Publish to PyPI
     needs: build_wheels
     runs-on: ubuntu-latest
     
@@ -52,7 +52,7 @@ jobs:
           name: wheel
           path: dist
           
-      - name: Publish to TestPyPI
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}          

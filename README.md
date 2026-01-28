@@ -8,7 +8,9 @@ A universal C++ solution for common needs in computer graphics software.
   - Python 3.9, Boost 1.76.0  
   - Python 3.10, Boost 1.80.0  
   - Python 3.11, Boost 1.82.0  
+  - Python 3.11, Boost 1.85.0  
   - Python 3.12, Boost 1.85.0  
+  - Python 3.13, Boost 1.85.0  
 - **Autodesk Maya** (Windows):  
   - Maya 2023: Python 3.9, Boost 1.76.0  
   - Maya 2024: Python 3.10, Boost 1.80.0  
@@ -18,6 +20,7 @@ A universal C++ solution for common needs in computer graphics software.
   - Houdini 19.5: Python 3.9, Boost 1.76.0  
   - Houdini 20.0: Python 3.10, Boost 1.80.0  
   - Houdini 20.5: Python 3.11, Boost 1.82.0  
+  - Houdini 21.0: Python 3.11, Boost 1.85.0  
 
 Support for additional platforms and DCC applications may be added in the future.
 

@@ -1,5 +1,5 @@
 """
-(c) Andriy Babak 2021-2025
+(c) Andriy Babak 2021-2026
 
 date: 31/05/2021
 modified: 03/04/2025 12:10:58
@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 
 __version__ = importlib.metadata.version("cgcpp")
-__copyright__ = "(c) Andriy Babak 2021-2025"
+__copyright__ = "(c) Andriy Babak 2021-2026"
 
 from . import build
 

@@ -27,7 +27,7 @@ jobs:
         id: vars
         run: |
           if ("${{ github.event_name }}" -eq "workflow_dispatch") {
-            echo "DOCKER_TAG=${{ github.event.inputs.tag }}" >> $env:GITHUB_OUTPUT
+            echo "DOCKER_TAG=$('${{ github.event.inputs.tag }}' -replace '^v', '' -replace '\.\w+$', '')" >> $env:GITHUB_OUTPUT
           } else {
             echo "DOCKER_TAG=$('${{ github.ref_name }}' -replace '^v', '' -replace '\.\w+$', '')" >> $env:GITHUB_OUTPUT
           }

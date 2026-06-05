@@ -2,7 +2,7 @@
 (c) Andriy Babak 2021-2024
 
 date: 01/06/2021
-modified: 30/01/2025 14:12:22
+modified: 05/06/2026 13:20:35
 
 Author: Andriy Babak
 e-mail: ababak@gmail.com
@@ -61,7 +61,7 @@ def main():
         maya_dir=args.maya,
         houdini_dir=args.houdini,
     )
-    if not result:
+    if result:
         sys.exit(result)
 
 

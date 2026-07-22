@@ -22,6 +22,7 @@ A universal C++ solution for common needs in computer graphics software.
   - Houdini 20.0: Python 3.10, Boost 1.80.0
   - Houdini 20.5: Python 3.11, Boost 1.82.0
   - Houdini 21.0: Python 3.11, Boost 1.85.0
+  - Houdini 22.0: Python 3.13, Boost 1.88.0
 
 Support for additional platforms and DCC applications may be added in the future.
 

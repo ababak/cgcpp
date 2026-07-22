@@ -1,7 +1,7 @@
 # (c) Andriy Babak 2020-2026
 # 
 # date: 08/09/2020
-# modified: 05/06/2026 13:44:50
+# modified: 22/07/2026 19:44:50
 # 
 # Author: Andriy Babak
 # e-mail: ababak@gmail.com
@@ -104,6 +104,11 @@ function(build_houdini_module HOUDINI_VERSION PROJECT_BUILD_TYPE)
         set(Python_ROOT_DIR "C:/Python311")
         set(BOOST_REQUESTED_VERSION 1.85.0)
         set(BOOST_ROOT "C:/local/boost_1_85_0")
+    elseif (Houdini_VERSION VERSION_EQUAL 22.0)
+        set(PYTHON_REQUESTED_VERSION 3.13)
+        set(Python_ROOT_DIR "C:/Python313")
+        set(BOOST_REQUESTED_VERSION 1.88.0)
+        set(BOOST_ROOT "C:/local/boost_1_88_0")
     else ()
         message( FATAL_ERROR "Unsupported Houdini version: ${HOUDINI_VERSION}" )
     endif ()
